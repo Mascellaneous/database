@@ -1,6 +1,6 @@
 // Configuration file for Google Sheets sync
 const CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwlEVIDqq6K13CFVnhGFZGaqXSduZElEEwLjUZ10Y9hvLiJRIbBQkCbyVlskuRuIPhQ/exec'
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzB5qn7YzK-UOaxcWHRGVd-MOGMVQQS_aKZ9UJbo4gnsF0ZFpggAoXYR-gWQkSsOzso/exec'
 };
 
 // Initialize sync on page load

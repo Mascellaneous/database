@@ -119,21 +119,21 @@
                         </div>
 
                         <div class="dropdown-filter">
-                            <button onclick="toggleDropdown('feature-dropdown')" class="dropdown-btn">
-                                特徵: ▼
+                            <button class="dropdown-btn" onclick="toggleDropdown('feature-dropdown')">
+                                特徵 ▼
                             </button>
                             <div id="feature-dropdown" class="dropdown-content">
                                 <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="feature" data-value="graph" onclick="toggleTriState(this)"></span>
+                                    <span class="tri-state-checkbox" data-filter="feature" data-value="含圖表" onclick="toggleTriState(this)"></span>
                                     含圖表
                                 </label>
                                 <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="feature" data-value="table" onclick="toggleTriState(this)"></span>
+                                    <span class="tri-state-checkbox" data-filter="feature" data-value="含表格" onclick="toggleTriState(this)"></span>
                                     含表格
                                 </label>
                                 <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="feature" data-value="multiple" onclick="toggleTriState(this)"></span>
-                                    多項選擇題
+                                    <span class="tri-state-checkbox" data-filter="feature" data-value="複選" onclick="toggleTriState(this)"></span>
+                                    複選
                                 </label>
                             </div>
                         </div>
@@ -216,7 +216,7 @@
 
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="multiple-selection-type">多項選擇題類型</label>
+                                <label for="multiple-selection-type">複選類型</label>
                                 <input type="text" id="multiple-selection-type" placeholder="留空則自動填入 '-'">
                             </div>
 

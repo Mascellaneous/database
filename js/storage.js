@@ -118,23 +118,52 @@ class IndexedDBStorage {
                     if (filters.triState.feature) {
                         const features = filters.triState.feature;
                         
-                        if (features['graph'] === 'checked') {
-                            questions = questions.filter(q => q.graphType && q.graphType !== '-');
-                        } else if (features['graph'] === 'excluded') {
-                            questions = questions.filter(q => !q.graphType || q.graphType === '-');
-                        }
-                        
-                        if (features['table'] === 'checked') {
-                            questions = questions.filter(q => q.tableType && q.tableType !== '-');
-                        } else if (features['table'] === 'excluded') {
-                            questions = questions.filter(q => !q.tableType || q.tableType === '-');
-                        }
-                        
-                        if (features['multiple'] === 'checked') {
-                            questions = questions.filter(q => q.multipleSelectionType && q.multipleSelectionType !== '-');
-                        } else if (features['multiple'] === 'excluded') {
-                            questions = questions.filter(q => !q.multipleSelectionType || q.multipleSelectionType === '-');
-                        }
+                        // Filter by specific feature values
+                        Object.entries(features).forEach(([value, state]) => {
+                            if (state === 'checked') {
+                                questions = questions.filter(q => {
+                                    if (value === '含圖表') {
+                                        return q.graphType && 
+                                            q.graphType !== '' && 
+                                            q.graphType !== '-' && 
+                                            q.graphType !== '沒有圖';
+                                    } else if (value === '含表格') {
+                                        return q.tableType && 
+                                            q.tableType !== '' && 
+                                            q.tableType !== '-' && 
+                                            q.tableType !== '沒有表格';
+                                    } else if (value === '複選') {
+                                        return q.multipleSelectionType && 
+                                            q.multipleSelectionType !== '' && 
+                                            q.multipleSelectionType !== '-' && 
+                                            q.multipleSelectionType !== '並非複選型' && 
+                                            q.multipleSelectionType !== '不適用';
+                                    }
+                                    return true;
+                                });
+                            } else if (state === 'excluded') {
+                                questions = questions.filter(q => {
+                                    if (value === '含圖表') {
+                                        return !q.graphType || 
+                                            q.graphType === '' || 
+                                            q.graphType === '-' || 
+                                            q.graphType === '沒有圖';
+                                    } else if (value === '含表格') {
+                                        return !q.tableType || 
+                                            q.tableType === '' || 
+                                            q.tableType === '-' || 
+                                            q.tableType === '沒有表格';
+                                    } else if (value === '複選') {
+                                        return !q.multipleSelectionType || 
+                                            q.multipleSelectionType === '' || 
+                                            q.multipleSelectionType === '-' || 
+                                            q.multipleSelectionType === '並非複選型' || 
+                                            q.multipleSelectionType === '不適用';
+                                    }
+                                    return true;
+                                });
+                            }
+                        });
                     }
                 }
                 
@@ -225,9 +254,9 @@ class GoogleSheetsSync {
             'Unique ID': 'id',
             'Plain text (Chi)': 'questionTextChi',
             'Plain text (Eng)': 'questionTextEng',
-            '多選類': 'multipleSelectionType',
-            'Graph': 'graphType',
-            'Table': 'tableType',
+            '複選類型': 'multipleSelectionType',
+            'Graph Type': 'graphType',
+            'Table Type': 'tableType',
             'Answer': 'answer',
             '答對百分比 (%)': 'correctPercentage',
             // '考試報告': 'markersReport',
