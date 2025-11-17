@@ -1,0 +1,181 @@
+/* ============================================
+   Filter Components
+   ============================================ */
+
+/* Filter Controls */
+.filters {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Search Box */
+#search {
+    flex: 1;
+    min-width: 300px;
+    padding: 12px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 25px;
+    font-size: 16px;
+    transition: all var(--transition-normal);
+}
+
+#search:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Select Dropdowns */
+select {
+    padding: 10px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--white-bg);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all var(--transition-normal);
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--border-focus);
+}
+
+/* Advanced Filters */
+.advanced-filters {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-lg);
+    background: var(--light-bg);
+    border-radius: var(--radius-lg);
+}
+
+.advanced-filters > p {
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.filter-group {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+/* Dropdown Filter */
+.dropdown-filter {
+    position: relative;
+    min-width: 200px;
+}
+
+.dropdown-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--white-bg);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.dropdown-btn:hover {
+    border-color: var(--border-focus);
+    background: #f5f5f5;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--white-bg);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    margin-top: 4px;
+    padding: 12px;
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: var(--z-dropdown);
+    box-shadow: var(--shadow-md);
+}
+
+.dropdown-content.active {
+    display: block;
+}
+
+/* Tri-State Checkbox */
+.tri-state-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.tri-state-label:hover {
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.tri-state-label:last-child {
+    border-bottom: none;
+}
+
+.tri-state-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.tri-state-checkbox::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--white-bg);
+}
+
+.tri-state-checkbox.checked::before {
+    background: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.tri-state-checkbox.checked::after {
+    content: '✓';
+    position: absolute;
+    color: var(--text-white);
+    font-weight: bold;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+}
+
+.tri-state-checkbox.excluded::before {
+    background: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.tri-state-checkbox.excluded::after {
+    content: '✕';
+    position: absolute;
+    color: var(--text-white);
+    font-weight: bold;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+}
