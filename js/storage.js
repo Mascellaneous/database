@@ -285,14 +285,14 @@ class GoogleSheetsSync {
             'Table Type': 'tableType',
             'Answer': 'answer',
             '答對百分比 (%)': 'correctPercentage',
-            // '考試報告': 'markersReport',
+            '考試報告': 'markersReport',
             'Marks': 'marks',
             '課程分類': 'curriculumClassification',
-            'Aristo Learning Focus分類 (以上載的文件為準)': 'chapterClassification'
-            // '涉及概念': 'concepts',
-            // 'MC題型': 'patternTags',
-            // 'MC選項設計': 'optionDesign',
-            // 'Remarks': 'remarks'
+            'Aristo Learning Focus分類 (以上載的文件為準)': 'chapterClassification',
+            '涉及概念': 'concepts',
+            'MC題型': 'patternTags',
+            'MC選項設計': 'optionDesign',
+            'Remarks': 'remarks'
         };
         
         this.requiredFields = ['examination', 'id'];
@@ -306,20 +306,34 @@ class GoogleSheetsSync {
     }
     
     async fetchData() {
-        console.log('📡 Fetching from Apps Script:', this.webAppUrl);
-        const response = await fetch(this.webAppUrl);
+        // Get current user from authManager
+        const username = window.authManager?.currentUser || '';
+        
+        if (!username) {
+            throw new Error('未登入，無法載入資料');
+        }
+        
+        const url = `${this.webAppUrl}?username=${encodeURIComponent(username)}`;
+        console.log('📡 Fetching from Apps Script with user:', username);
+        
+        const response = await fetch(url);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: 無法讀取資料`);
         }
         
-        const text = await response.text();
+        const result = await response.json();
         
-        if (text.startsWith('Error:')) {
-            throw new Error(text);
+        if (result.error) {
+            throw new Error(result.message || '驗證失敗');
         }
         
-        return text;
+        // Update user group if changed
+        if (result.userGroup && window.authManager) {
+            window.authManager.userGroup = result.userGroup;
+        }
+        
+        return result.data;
     }
     
     validateHeaders(headers) {
@@ -426,8 +440,13 @@ class GoogleSheetsSync {
             Object.entries(validation.mappedFields).forEach(([dbField, info]) => {
                 let value = values[info.columnIndex] || '';
                 
-                // Don't trim yet - we need to preserve formatting for multi-line fields
-                if (!value) return;
+                if (!value) {
+                    // ✅ FIX: Initialize array fields as empty arrays
+                    if (['curriculumClassification', 'chapterClassification', 'concepts', 'patternTags'].includes(dbField)) {
+                        question[dbField] = [];
+                    }
+                    return;
+                }
                 
                 switch (dbField) {
                     case 'year':                        
@@ -444,8 +463,13 @@ class GoogleSheetsSync {
                     case 'chapterClassification':
                     case 'concepts':
                     case 'patternTags':
-                        // Trim before splitting for array fields
-                        question[dbField] = value.trim().split(',').map(s => s.trim()).filter(s => s);
+                        // ✅ FIX: Always ensure these are arrays
+                        const trimmedValue = value.trim();
+                        if (trimmedValue) {
+                            question[dbField] = trimmedValue.split(',').map(s => s.trim()).filter(s => s);
+                        } else {
+                            question[dbField] = [];
+                        }
                         break;
                         
                     case 'multipleSelectionType':
@@ -459,14 +483,18 @@ class GoogleSheetsSync {
                     case 'questionTextEng':
                     case 'markersReport':
                     case 'remarks':
-                        // Only trim leading/trailing whitespace from the entire text
-                        // but preserve internal formatting and newlines
                         question[dbField] = value.trim();
                         break;
                         
                     default:
-                        // For all other fields, trim normally
                         question[dbField] = value.trim();
+                }
+            });
+            
+            // ✅ Ensure array fields exist even if not in the data
+            ['curriculumClassification', 'chapterClassification', 'concepts', 'patternTags'].forEach(field => {
+                if (!question[field]) {
+                    question[field] = [];
                 }
             });
             

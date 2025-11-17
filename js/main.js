@@ -4,9 +4,28 @@
 
 // Initialize application
 async function init() {
+    console.log('🚀 初始化應用程式...');
+
+    // Safety check: ensure authManager exists
+    if (!window.authManager) {
+        console.error('❌ AuthManager not initialized!');
+        alert('系統錯誤：認證模組未載入，請重新整理頁面');
+        return;
+    }    
+
+    // Check if user is authenticated (from cookie)
+    if (!window.authManager.isAuthenticated()) {
+        console.log('❌ 未登入，顯示登入視窗');
+        showLoginModal();
+        return; // Stop initialization until user logs in
+    }
+    
+    console.log('✅ 使用者已登入:', window.authManager.displayName);
+    
     // Show loading state
     showLoadingState(true);
     
+    // Initialize storage
     window.storage = new IndexedDBStorage();
     
     try {
@@ -25,41 +44,51 @@ async function init() {
             statusElement.classList.add('disconnected');
             statusElement.style.color = '#e74c3c';
         }
+        showLoadingState(false);
+        return; // Stop if storage fails
     }
     
-    // Auto-sync from Google Sheets on page load (via config.js)
-    // The config.js file will initialize window.googleSheetsSync automatically
+    // Auto-sync from Google Sheets on page load (for cookie-based login)
     if (window.googleSheetsSync) {
         try {
             console.log('📥 開始從 Google Sheets 載入資料...');
             const result = await window.googleSheetsSync.syncOnLoad();
             
             if (result.success) {
-                const statusElement = document.getElementById('sync-status');
-                if (statusElement) {
-                    window.googleSheetsSync.updateSyncStatus(result);
-                }
                 console.log('✅ Google Sheets 資料載入完成');
+                console.log(`📊 載入 ${result.count} 題`);
             }
         } catch (error) {
             console.error('Failed to sync on load:', error);
-            // Don't show alert on initial load, just log the error
             console.warn('⚠️ Google Sheets 同步失敗:', error.message);
+            // Don't stop - continue with whatever data is in IndexedDB
         }
     }
     
-    setupFormHandler();
-    setupEventListeners();
-    // Initialize percentage slider
-    if (document.getElementById('min-percentage')) {
-        updateDualRange();
-    }    
-    await populateYearFilter();
-    await renderQuestions();
-    await refreshStatistics();
+    // Initialize UI components
+    await initializeApp();
     
     // Hide loading state after everything is loaded
     showLoadingState(false);
+    
+    console.log('✅ 應用程式初始化完成');
+}
+
+// Initialize app UI (called by both init() and attemptLogin())
+async function initializeApp() {
+    console.log('🔧 初始化應用程式介面...');
+    
+    setupFormHandler();
+    setupEventListeners();
+    
+    // Initialize percentage slider
+    if (document.getElementById('min-percentage')) {
+        updateDualRange();
+    }
+    
+    await populateYearFilter();
+    await renderQuestions();
+    await refreshStatistics();
 }
 
 // Show/Hide loading state
@@ -85,12 +114,9 @@ async function manualSync() {
         hideLoading();
         
         if (result.success) {
-            const statusElement = document.getElementById('sync-status');
-            if (statusElement) {
-                window.googleSheetsSync.updateSyncStatus(result);
-            }
             await refreshViews();
             alert(`✅ 同步成功！\n\n匯入 ${result.count} 題`);
+            console.log('✅ Google Sheets 資料同步完成');
         }
     } catch (error) {
         hideLoading();
