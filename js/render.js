@@ -5,7 +5,8 @@ async function renderQuestions() {
         examination: document.getElementById('exam-filter').value,
         year: document.getElementById('year-filter').value,
         questionType: document.getElementById('qtype-filter').value,
-        triState: triStateFilters
+        triState: triStateFilters,
+        percentageFilter: window.percentageFilter 
     };
     
     const questions = await storage.getQuestions(filters);

@@ -50,6 +50,10 @@ async function init() {
     
     setupFormHandler();
     setupEventListeners();
+    // Initialize percentage slider
+    if (document.getElementById('min-percentage')) {
+        updateDualRange();
+    }    
     await populateYearFilter();
     await renderQuestions();
     await refreshStatistics();

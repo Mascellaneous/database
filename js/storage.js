@@ -91,7 +91,33 @@ class IndexedDBStorage {
                 if (filters.questionType) {
                     questions = questions.filter(q => q.questionType === filters.questionType);
                 }
-                
+
+                // Percentage filter (答對率)
+                if (filters.percentageFilter && filters.percentageFilter.active) {
+                    const { min, max } = filters.percentageFilter;
+                    
+                    questions = questions.filter(q => {
+                        // Skip questions without percentage data
+                        if (q.correctPercentage === undefined || 
+                            q.correctPercentage === null || 
+                            q.correctPercentage === '') {
+                            return false;
+                        }
+                        
+                        const percentage = parseFloat(q.correctPercentage);
+                        
+                        // Skip invalid percentages
+                        if (isNaN(percentage)) {
+                            return false;
+                        }
+                        
+                        // Check if percentage is within range (inclusive)
+                        return percentage >= min && percentage <= max;
+                    });
+                    
+                    console.log(`📊 Filtered by 答對率 ${min}%-${max}%: ${questions.length} questions`);
+                }                
+
                 // Tri-state filters
                 if (filters.triState) {
                     // Curriculum filters
