@@ -229,8 +229,14 @@ class GoogleSheetsSync {
             'Table': 'tableType',
             'Answer': 'answer',
             '答對百分比 (%)': 'correctPercentage',
+            '考試報告': 'markersReport',
             'Marks': 'marks',
-            '課程分類': 'curriculumClassification'
+            '課程分類': 'curriculumClassification',
+            'Aristo Learning Focus分類 (以上載的文件為準)': 'chapterClassification',
+            '涉及概念': 'concepts',
+            'MC題型': 'patternTags',
+            'MC選項設計': 'optionDesign',
+            'Remarks': 'remarks'
         };
         
         this.requiredFields = ['examination', 'id'];
@@ -520,6 +526,5 @@ class GoogleSheetsSync {
         }
     }
 }
-
 
 window.googleSheetsSync = null;

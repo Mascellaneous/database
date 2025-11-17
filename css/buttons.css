@@ -255,6 +255,15 @@
     transform: translateY(0);
 }
 
+/* Admin-only Button - Hidden when not in admin mode */
+.btn-admin-only {
+    display: none;
+}
+
+.btn-admin-only.admin-active {
+    display: inline-flex;
+}
+
 /* Disabled Button */
 .btn:disabled {
     opacity: 0.5;

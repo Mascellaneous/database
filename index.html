@@ -143,20 +143,12 @@
                 <!-- Question Count and Actions -->
                 <div class="action-bar">
                     <h2 id="question-count">總題目數: 0</h2>
-                <div class="action-buttons">
-                    <button onclick="exportData()" class="btn btn-outline-primary">
-                        <span class="btn-icon">📥</span>
-                        <span class="btn-text">匯出 JSON</span>
-                    </button>
-                    <button onclick="importData()" class="btn btn-outline-primary">
-                        <span class="btn-icon">📤</span>
-                        <span class="btn-text">匯入 JSON</span>
-                    </button>
-                    <button onclick="clearDatabase()" class="btn btn-outline-danger">
-                        <span class="btn-icon">🗑️</span>
-                        <span class="btn-text">清除資料庫</span>
-                    </button>
-                </div>
+                    <div>
+                        <button class="btn btn-admin-only btn-outline-primary" onclick="exportJSON()">📥 匯出 JSON</button>
+                        <button class="btn btn-admin-only btn-outline-primary" onclick="importJSON()">📤 匯入 JSON</button>
+                        <button class="btn btn-admin-only btn-outline-danger" onclick="clearDatabase()">🗑️ 清除資料庫</button>
+                        <button class="btn btn-admin-only btn-primary" onclick="toggleForm()">➕ 新增題目</button>
+                    </div>
                 </div>
 
                 <!-- Add/Edit Question Form (Hidden by default) -->

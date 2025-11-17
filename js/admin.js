@@ -93,6 +93,7 @@ function updateAdminUI() {
         return;
     }
     
+    // Update admin mode toggle button
     if (isAdminMode) {
         statusElement.textContent = '✓ 已啟用';
         statusElement.style.color = '#27ae60';
@@ -110,6 +111,16 @@ function updateAdminUI() {
         toggleButton.style.borderColor = '';
         toggleButton.innerHTML = '🔒 管理員模式';
     }
+    
+    // Update admin-only buttons (Import/Export JSON, Add Question, Clear Database)
+    const adminButtons = document.querySelectorAll('.btn-admin-only');
+    adminButtons.forEach(button => {
+        if (isAdminMode) {
+            button.classList.add('admin-active');
+        } else {
+            button.classList.remove('admin-active');
+        }
+    });
 }
 
 /**
