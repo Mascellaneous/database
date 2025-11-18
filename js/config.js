@@ -2,7 +2,7 @@
 // Dependencies: storage-sync.js (GoogleSheetsSync)
 
 const CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzvSMOfaXHWb0e1jS78RcsdjxsqMT91QkE0iPqN1tFoWZiOzuLhDV3e9PXqxWkUjLg_/exec'
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxpWvU7klOmTcWezFVHoq6Kk6r8oOftjRy7fb7o8ev1wNGdFeHtA5-3dUwm2rTUJ2EW/exec'
 };
 
 // Initialize sync on page load

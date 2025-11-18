@@ -1,4 +1,4 @@
-// Authentication and Authorization with Cookie Support
+// Authentication and Authorization with Cookie & LocalStorage Support
 // Dependencies: None (core authentication module)
 class AuthManager {
     constructor() {
@@ -7,34 +7,38 @@ class AuthManager {
         this.userGroup = null;
         this.COOKIE_NAME = 'econ_db_auth';
         this.COOKIE_DAYS = 365; // Cookie expires after 365 days (1 year)
+        this.LOCAL_STORAGE_KEY = 'econ_db_auth_storage';
+        this.cookiesAvailable = this.checkCookieSupport();
     }
     
-    // Check if user is logged in (from cookie)
+    // Check if user is logged in (from cookie or localStorage fallback)
     // Dependencies: None
     isAuthenticated() {
-        const cookieData = this.getCookie(this.COOKIE_NAME);
-        if (cookieData) {
+        const rawData = this.getPersistedAuthData();
+        
+        if (rawData) {
             try {
-                const userData = JSON.parse(decodeURIComponent(cookieData));
+                const userData = JSON.parse(decodeURIComponent(rawData));
                 this.currentUser = userData.username;
                 this.displayName = userData.displayName;
                 this.userGroup = userData.userGroup;
                 return true;
             } catch (e) {
-                this.deleteCookie(this.COOKIE_NAME);
+                this.clearPersistedAuth();
                 return false;
             }
         }
+        
         return false;
     }
     
-    // Save user credentials to cookie
+    // Save user credentials to persistence layer
     // Dependencies: None
     saveUser(username, displayName, userGroup) {
         const userData = {
-            username: username,
-            displayName: displayName,
-            userGroup: userGroup,
+            username,
+            displayName,
+            userGroup,
             loginTime: new Date().toISOString()
         };
         
@@ -42,29 +46,82 @@ class AuthManager {
         this.displayName = displayName;
         this.userGroup = userGroup;
         
-        // Save to cookie
-        this.setCookie(this.COOKIE_NAME, JSON.stringify(userData), this.COOKIE_DAYS);
+        this.persistAuthData(userData);
     }
     
-    // Logout - clear cookie
+    // Logout - clear persistence
     // Dependencies: None
     logout() {
-        this.deleteCookie(this.COOKIE_NAME);
+        this.clearPersistedAuth();
         this.currentUser = null;
         this.displayName = null;
         this.userGroup = null;
         window.location.reload();
     }
     
+    // Determine if cookies can be used
+    // Dependencies: None
+    checkCookieSupport() {
+        try {
+            const testName = '__econ_cookie_test__';
+            document.cookie = `${testName}=1; SameSite=Lax; path=/`;
+            const enabled = document.cookie.indexOf(`${testName}=`) !== -1;
+            document.cookie = `${testName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+            return enabled;
+        } catch (error) {
+            return false;
+        }
+    }
+    
+    // Persist auth data (cookie preferred, localStorage fallback)
+    // Dependencies: None
+    persistAuthData(userData) {
+        const serialized = encodeURIComponent(JSON.stringify(userData));
+        
+        if (this.cookiesAvailable) {
+            const cookieSaved = this.setCookie(this.COOKIE_NAME, serialized, this.COOKIE_DAYS);
+            if (cookieSaved) {
+                this.safeLocalStorageRemove(this.LOCAL_STORAGE_KEY);
+                return;
+            }
+        }
+        
+        this.safeLocalStorageSet(this.LOCAL_STORAGE_KEY, serialized);
+    }
+    
+    // Retrieve persisted auth data
+    // Dependencies: None
+    getPersistedAuthData() {
+        if (this.cookiesAvailable) {
+            const fromCookie = this.getCookie(this.COOKIE_NAME);
+            if (fromCookie) return fromCookie;
+        }
+        return this.safeLocalStorageGet(this.LOCAL_STORAGE_KEY);
+    }
+    
+    // Clear persisted auth data
+    // Dependencies: None
+    clearPersistedAuth() {
+        if (this.cookiesAvailable) {
+            this.deleteCookie(this.COOKIE_NAME);
+        }
+        this.safeLocalStorageRemove(this.LOCAL_STORAGE_KEY);
+    }
+    
     // Cookie helper functions
     // Dependencies: None
     setCookie(name, value, days) {
-        const date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        const expires = "expires=" + date.toUTCString();
-        // Remove SameSite=Strict if it's causing issues, or use Lax
-        document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/;SameSite=Lax";
-        console.log('🍪 Cookie saved:', name, 'expires in', days, 'days');
+        try {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            const secureFlag = location.protocol === 'https:' ? '; Secure' : '';
+            
+            document.cookie = `${name}=${value}; ${expires}; path=/; SameSite=Lax${secureFlag}`;
+            return document.cookie.indexOf(`${name}=`) !== -1;
+        } catch (error) {
+            return false;
+        }
     }
     
     // Dependencies: None
@@ -82,7 +139,40 @@ class AuthManager {
     
     // Dependencies: None
     deleteCookie(name) {
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+        try {
+            document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+        } catch (error) {
+            // Silent fail
+        }
+    }
+    
+    // LocalStorage helpers with fail-safe
+    // Dependencies: None
+    safeLocalStorageSet(key, value) {
+        try {
+            localStorage.setItem(key, value);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+    
+    // Dependencies: None
+    safeLocalStorageGet(key) {
+        try {
+            return localStorage.getItem(key);
+        } catch (error) {
+            return null;
+        }
+    }
+    
+    // Dependencies: None
+    safeLocalStorageRemove(key) {
+        try {
+            localStorage.removeItem(key);
+        } catch (error) {
+            // Silent fail
+        }
     }
     
     // Check permissions
@@ -221,12 +311,7 @@ async function attemptLogin() {
             hideLoading();
             errorDiv.innerHTML = '❌ ' + result.message;
             errorDiv.style.display = 'block';
-            
-            // Re-enable button
-            loginBtn.disabled = false;
-            loginBtn.textContent = '驗證';
-            loginBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            loginBtn.style.cursor = 'pointer';
+            resetLoginButton(loginBtn);
             return;
         }
         
@@ -235,16 +320,11 @@ async function attemptLogin() {
             hideLoading();
             errorDiv.innerHTML = '❌ 驗證失敗';
             errorDiv.style.display = 'block';
-            
-            // Re-enable button
-            loginBtn.disabled = false;
-            loginBtn.textContent = '驗證';
-            loginBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            loginBtn.style.cursor = 'pointer';
+            resetLoginButton(loginBtn);
             return;
         }
         
-        // Save user credentials to cookie
+        // Save user credentials
         window.authManager.saveUser(result.username, result.displayName, result.userGroup);
         
         // Remove login modal
@@ -271,13 +351,11 @@ async function attemptLogin() {
             // Initialize the rest of the app
             await initializeApp();
         } else {
-            console.error('No data received from server');
             alert('❌ 伺服器未返回資料');
         }
         
     } catch (error) {
         hideLoading();
-        console.error('Login error:', error);
         
         // Better error messages
         let errorMessage = '驗證失敗';
@@ -292,13 +370,17 @@ async function attemptLogin() {
         
         errorDiv.innerHTML = '❌ ' + errorMessage;
         errorDiv.style.display = 'block';
-        
-        // Re-enable button
-        loginBtn.disabled = false;
-        loginBtn.textContent = '驗證';
-        loginBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        loginBtn.style.cursor = 'pointer';
+        resetLoginButton(loginBtn);
     }
+}
+
+// Reset login button UI
+// Dependencies: None
+function resetLoginButton(button) {
+    button.disabled = false;
+    button.textContent = '進入系統';
+    button.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    button.style.cursor = 'pointer';
 }
 
 // Show welcome message
@@ -435,11 +517,8 @@ async function loadAuthenticatedData(data) {
         
         hideLoading();
         
-        console.log(`✅ 已載入 ${questions.length} 題`);
-        
     } catch (error) {
         hideLoading();
-        console.error('Data load error:', error);
         alert('❌ 資料載入失敗: ' + error.message);
     }
 }
@@ -448,8 +527,6 @@ async function loadAuthenticatedData(data) {
 // Dependencies: forms.js (setupFormHandler), filters.js (updateDualRange), main.js (populateYearFilter), render.js (renderQuestions), statistics.js (refreshStatistics)
 async function initializeApp() {
     try {
-        console.log('🔧 初始化應用程式介面...');
-        
         setupFormHandler();
         setupEventListeners();
         
@@ -462,10 +539,7 @@ async function initializeApp() {
         await renderQuestions();
         await refreshStatistics();
         
-        console.log('✅ 應用程式初始化完成');
-        
     } catch (error) {
-        console.error('App initialization error:', error);
         alert('❌ 應用程式初始化失敗: ' + error.message);
     }
 }

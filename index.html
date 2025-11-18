@@ -14,11 +14,13 @@
     <!-- Main Container -->
     <div class="container">
         <header>
-            <div id="storage-status">檢查資料庫...</div>
             <h1>📚 HKDSE 經濟科題目資料庫</h1>
             <p>管理及搜尋 HKDSE、HKCEE、HKALE 經濟科試題</p>
-            <div id="sync-status">檢查資料庫...</div>
-            <button onclick="manualSync()" class="btn btn-info">🔄 重新載入資料</button>
+            <!-- Storage status and reload button on same line -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 15px;">
+                <div id="storage-status" style="color: rgba(255,255,255,0.9); font-size: 14px;">檢查資料庫...</div>
+                <button onclick="manualSync()" class="btn btn-info">🔄 重新載入資料</button>
+            </div>
         </header>      
         <nav class="tabs">
             <button class="tab active" onclick="switchTab('questions')">題目</button>
@@ -204,7 +206,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="section">卷別</label>
+                                <label for="section">Section</label>
                                 <input type="text" id="section">
                             </div>
 
@@ -274,19 +276,8 @@
                                         <span class="placeholder">選擇課程分類...</span>
                                     </div>
                                     <div class="multi-select-options" id="curriculum-options">
-                                        <div class="options-list">
-                                            <label><input type="checkbox" value="A 基本經濟概念"> A 基本經濟概念</label>
-                                            <label><input type="checkbox" value="B 廠商與生產"> B 廠商與生產</label>
-                                            <label><input type="checkbox" value="C 市場與價格"> C 市場與價格</label>
-                                            <label><input type="checkbox" value="D 競爭與市場結構"> D 競爭與市場結構</label>
-                                            <label><input type="checkbox" value="E 效率、公平和政府的角色"> E 效率、公平和政府的角色</label>
-                                            <label><input type="checkbox" value="F 經濟表現的量度"> F 經濟表現的量度</label>
-                                            <label><input type="checkbox" value="G 國民收入決定及價格水平"> G 國民收入決定及價格水平</label>
-                                            <label><input type="checkbox" value="H 貨幣與銀行"> H 貨幣與銀行</label>
-                                            <label><input type="checkbox" value="I 宏觀經濟問題和政府"> I 宏觀經濟問題和政府</label>
-                                            <label><input type="checkbox" value="J 國際貿易和金融"> J 國際貿易和金融</label>
-                                            <label><input type="checkbox" value="E1 選修單元一"> E1 選修單元一</label>
-                                            <label><input type="checkbox" value="E2 選修單元二"> E2 選修單元二</label>
+                                        <div class="options-list" id="curriculum-options-list">
+                                            <!-- Dynamically populated by JavaScript -->
                                         </div>
                                     </div>
                                     <!-- 隱藏欄位，儲存逗號分隔字串 -->
@@ -295,7 +286,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="chapter-classification">章節分類 (用逗號分隔)</label>
+                                <label for="chapter-classification">Chapters (用逗號分隔)</label>
                                 <input type="text" id="chapter-classification">
                             </div>
                         </div>
@@ -379,11 +370,14 @@
     <!-- End of Container -->
 
     <button id="scroll-to-top" onclick="scrollToTop()" title="回到頂部">↑</button>
-        <!-- Hidden Admin Toggle (in settings section) -->
+        <!-- Hidden Admin Toggle -->
         <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border-color);">
             <button onclick="toggleAdminMode()" class="btn-secondary" style="opacity: 0.3;">
                 🔒 管理員模式
             </button>
+            <button id="logout-btn" onclick="window.authManager.logout()" class="btn btn-danger" style="display: none;">
+                🚪 登出
+            </button>            
             <span id="admin-status" style="margin-left: 10px; color: #95a5a6; font-size: 12px;"></span>
         </div> 
 

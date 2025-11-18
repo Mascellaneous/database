@@ -92,64 +92,7 @@ function updateStorageStatus(status, message) {
 // Update UI to show logged-in user and logout button
 // Dependencies: auth.js (window.authManager)
 function updateUserDisplay() {
-    const header = document.querySelector('header');
-    if (!header || !window.authManager) return;
-    
-    // Check if user info already exists
-    if (document.getElementById('user-info-section')) return;
-    
-    // Create user info section
-    const userInfoSection = document.createElement('div');
-    userInfoSection.id = 'user-info-section';
-    userInfoSection.style.cssText = `
-        position: absolute;
-        top: 30px;
-        right: 30px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    `;
-    
-    // User display name
-    const userNameSpan = document.createElement('span');
-    userNameSpan.style.cssText = 'color: white; font-size: 14px; opacity: 0.95;';
-    userNameSpan.innerHTML = `
-        👤 ${window.authManager.displayName}
-        ${window.authManager.userGroup ? `<span style="opacity: 0.8;">(${window.authManager.userGroup})</span>` : ''}
-    `;
-    userInfoSection.appendChild(userNameSpan);
-    
-    // Logout button (only for admins)
-    if (window.authManager.canEdit()) {
-        const logoutBtn = document.createElement('button');
-        logoutBtn.onclick = logout;
-        logoutBtn.className = 'btn';
-        logoutBtn.style.cssText = `
-            background: rgba(231, 76, 60, 0.9);
-            color: white;
-            padding: 8px 16px;
-            font-size: 13px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-        `;
-        logoutBtn.innerHTML = '🚪 離開系統';
-        
-        // Hover effect
-        logoutBtn.addEventListener('mouseenter', function() {
-            this.style.background = '#c0392b';
-            this.style.transform = 'translateY(-2px)';
-        });
-        logoutBtn.addEventListener('mouseleave', function() {
-            this.style.background = 'rgba(231, 76, 60, 0.9)';
-            this.style.transform = 'translateY(0)';
-        });
-        
-        userInfoSection.appendChild(logoutBtn);
-    }
-    
-    header.appendChild(userInfoSection);
+    // Do nothing - user info not displayed on UI
 }
 
 // Initialize app UI (called by init() and also by auth.js after login)
@@ -362,12 +305,14 @@ if (document.readyState === 'loading') {
         populateCurriculumFilter();
         populateChapterFilter();
         populateFeatureFilter();
+        populateCurriculumFormOptions();
         init();
     });
 } else {
     populateCurriculumFilter();
     populateChapterFilter();
     populateFeatureFilter();
+    populateCurriculumFormOptions();
     init();
 }
 

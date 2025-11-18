@@ -92,6 +92,7 @@ async function toggleAdminMode() {
 function updateAdminUI() {
     const statusElement = document.getElementById('admin-status');
     const toggleButton = document.querySelector('[onclick="toggleAdminMode()"]');
+    const logoutButton = document.getElementById('logout-btn');
     
     if (!statusElement || !toggleButton) {
         console.warn('Admin UI elements not found');
@@ -108,6 +109,11 @@ function updateAdminUI() {
         toggleButton.style.color = 'white';
         toggleButton.style.borderColor = '#27ae60';
         toggleButton.innerHTML = '🔓 管理員模式';
+        
+        // Show logout button when admin mode is active
+        if (logoutButton) {
+            logoutButton.style.display = 'inline-flex';
+        }
     } else {
         statusElement.textContent = '';
         toggleButton.style.opacity = '0.3';
@@ -115,6 +121,11 @@ function updateAdminUI() {
         toggleButton.style.color = '';
         toggleButton.style.borderColor = '';
         toggleButton.innerHTML = '🔒 管理員模式';
+        
+        // Hide logout button when admin mode is not active
+        if (logoutButton) {
+            logoutButton.style.display = 'none';
+        }
     }
     
     // Update admin-only buttons (Import/Export JSON, Add Question, Clear Database)
