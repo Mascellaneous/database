@@ -2,7 +2,17 @@
    Main Application Initialization
    ============================================ */
 
+// Dependencies: auth.js, storage.js, render.js, filters.js, statistics.js
+
+// Logout function
+function logout() {
+    if (confirm('確定要離開系統嗎？')) {
+        window.authManager.logout();
+    }
+}
+
 // Initialize application
+// Dependencies: auth.js (window.authManager, showLoginModal), storage-core.js (IndexedDBStorage)
 async function init() {
     console.log('🚀 初始化應用程式...');
 
@@ -15,12 +25,15 @@ async function init() {
 
     // Check if user is authenticated (from cookie)
     if (!window.authManager.isAuthenticated()) {
-        console.log('❌ 未登入，顯示登入視窗');
-        showLoginModal();
+        console.log('❌ 未驗證，顯示驗證視窗');
+        showLoginModal(); // This is defined in auth.js
         return; // Stop initialization until user logs in
     }
     
-    console.log('✅ 使用者已登入:', window.authManager.displayName);
+    console.log('✅ 使用者已驗證:', window.authManager.displayName);
+    
+    // Update UI to show logged-in user
+    updateUserDisplay();
     
     // Show loading state
     showLoadingState(true);
@@ -30,20 +43,10 @@ async function init() {
     
     try {
         await window.storage.init();
-        const statusElement = document.getElementById('storage-status');
-        if (statusElement) {
-            statusElement.textContent = '✓ 資料庫已連接';
-            statusElement.classList.add('connected');
-            statusElement.style.color = '#27ae60';
-        }
+        updateStorageStatus('connected', '✓ 資料庫已連接');
     } catch (error) {
         console.error('Failed to initialize storage:', error);
-        const statusElement = document.getElementById('storage-status');
-        if (statusElement) {
-            statusElement.textContent = '✗ 資料庫連接失敗';
-            statusElement.classList.add('disconnected');
-            statusElement.style.color = '#e74c3c';
-        }
+        updateStorageStatus('disconnected', '✗ 資料庫連接失敗');
         showLoadingState(false);
         return; // Stop if storage fails
     }
@@ -74,7 +77,83 @@ async function init() {
     console.log('✅ 應用程式初始化完成');
 }
 
-// Initialize app UI (called by both init() and attemptLogin())
+// Update storage status indicator
+// Dependencies: None
+function updateStorageStatus(status, message) {
+    const statusElement = document.getElementById('storage-status');
+    if (statusElement) {
+        statusElement.textContent = message;
+        statusElement.className = ''; // Clear all classes
+        statusElement.classList.add(status);
+        statusElement.style.color = status === 'connected' ? '#27ae60' : '#e74c3c';
+    }
+}
+
+// Update UI to show logged-in user and logout button
+// Dependencies: auth.js (window.authManager)
+function updateUserDisplay() {
+    const header = document.querySelector('header');
+    if (!header || !window.authManager) return;
+    
+    // Check if user info already exists
+    if (document.getElementById('user-info-section')) return;
+    
+    // Create user info section
+    const userInfoSection = document.createElement('div');
+    userInfoSection.id = 'user-info-section';
+    userInfoSection.style.cssText = `
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    `;
+    
+    // User display name
+    const userNameSpan = document.createElement('span');
+    userNameSpan.style.cssText = 'color: white; font-size: 14px; opacity: 0.95;';
+    userNameSpan.innerHTML = `
+        👤 ${window.authManager.displayName}
+        ${window.authManager.userGroup ? `<span style="opacity: 0.8;">(${window.authManager.userGroup})</span>` : ''}
+    `;
+    userInfoSection.appendChild(userNameSpan);
+    
+    // Logout button (only for admins)
+    if (window.authManager.canEdit()) {
+        const logoutBtn = document.createElement('button');
+        logoutBtn.onclick = logout;
+        logoutBtn.className = 'btn';
+        logoutBtn.style.cssText = `
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            padding: 8px 16px;
+            font-size: 13px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        `;
+        logoutBtn.innerHTML = '🚪 離開系統';
+        
+        // Hover effect
+        logoutBtn.addEventListener('mouseenter', function() {
+            this.style.background = '#c0392b';
+            this.style.transform = 'translateY(-2px)';
+        });
+        logoutBtn.addEventListener('mouseleave', function() {
+            this.style.background = 'rgba(231, 76, 60, 0.9)';
+            this.style.transform = 'translateY(0)';
+        });
+        
+        userInfoSection.appendChild(logoutBtn);
+    }
+    
+    header.appendChild(userInfoSection);
+}
+
+// Initialize app UI (called by init() and also by auth.js after login)
+// Dependencies: forms.js (setupFormHandler), filters.js (updateDualRange), render.js (renderQuestions), statistics.js (refreshStatistics)
 async function initializeApp() {
     console.log('🔧 初始化應用程式介面...');
     
@@ -92,14 +171,28 @@ async function initializeApp() {
 }
 
 // Show/Hide loading state
+// Dependencies: None
 function showLoadingState(show) {
     const loadingElement = document.getElementById('loading-indicator');
     if (loadingElement) {
         loadingElement.style.display = show ? 'block' : 'none';
     }
+    
+    // Clear "檢查資料庫..." text when hiding loading
+    if (!show) {
+        const statusElement = document.getElementById('storage-status');
+        if (statusElement) {
+            const currentText = statusElement.textContent.trim();
+            // Only clear if it's still showing the loading message
+            if (currentText === '檢查資料庫...') {
+                statusElement.textContent = '';
+            }
+        }
+    }
 }
 
 // Manual sync (reload from Google Sheets)
+// Dependencies: storage-sync.js (window.googleSheetsSync)
 async function manualSync() {
     if (!window.googleSheetsSync) {
         alert('Google Sheets 未設定，請檢查 config.js');
@@ -125,6 +218,7 @@ async function manualSync() {
 }
 
 // Helper functions
+// Dependencies: None
 function showLoading(message) {
     let loader = document.getElementById('loading-overlay');
     if (!loader) {
@@ -145,11 +239,13 @@ function showLoading(message) {
     `;
 }
 
+// Dependencies: None
 function hideLoading() {
     const loader = document.getElementById('loading-overlay');
     if (loader) loader.remove();
 }
 
+// Dependencies: render.js (renderQuestions), statistics.js (refreshStatistics)
 async function refreshViews() {
     await populateYearFilter();
     await renderQuestions();
@@ -157,6 +253,7 @@ async function refreshViews() {
 }
 
 // Tab switching
+// Dependencies: statistics.js (renderPublishers, renderTopics, renderConcepts, renderPatterns), globals.js (window.currentTab)
 function switchTab(tabName) {
     window.currentTab = tabName;
     
@@ -164,7 +261,8 @@ function switchTab(tabName) {
     document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.remove('active');
     });
-    event.target.classList.add('active');
+    event.target.classList.remove('active');
+    document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
     
     // Update tab content
     document.querySelectorAll('.tab-content').forEach(content => {
@@ -177,6 +275,8 @@ function switchTab(tabName) {
         renderPublishers();
     } else if (tabName === 'topics') {
         renderTopics();
+    } else if (tabName === 'chapters') {
+        renderChapters();     
     } else if (tabName === 'concepts') {
         renderConcepts();
     } else if (tabName === 'patterns') {
@@ -185,6 +285,7 @@ function switchTab(tabName) {
 }
 
 // Event listeners
+// Dependencies: filters.js (filterQuestions)
 function setupEventListeners() {
     document.getElementById('search').addEventListener('input', debounce(filterQuestions, 300));
     document.getElementById('exam-filter').addEventListener('change', filterQuestions);
@@ -203,6 +304,7 @@ function setupEventListeners() {
 }
 
 // Scroll to top
+// Dependencies: None
 function scrollToTop() {
     window.scrollTo({
         top: 0,
@@ -211,6 +313,7 @@ function scrollToTop() {
 }
 
 // Debounce utility
+// Dependencies: None
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -224,6 +327,7 @@ function debounce(func, wait) {
 }
 
 // Populate year filter
+// Dependencies: storage-core.js (window.storage)
 async function populateYearFilter() {
     const questions = await window.storage.getQuestions();
     const years = [...new Set(questions.map(q => q.year))].sort((a, b) => b - a);
@@ -240,6 +344,7 @@ async function populateYearFilter() {
 }
 
 // Clear database
+// Dependencies: storage-core.js (window.storage)
 async function clearDatabase() {
     if (confirm('確定要清除所有資料？此操作無法復原！')) {
         if (confirm('請再次確認：真的要刪除所有題目嗎？')) {
@@ -251,8 +356,18 @@ async function clearDatabase() {
 }
 
 // Initialize when DOM is ready
+// Dependencies: None
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => {
+        populateCurriculumFilter();
+        populateChapterFilter();
+        populateFeatureFilter();
+        init();
+    });
 } else {
+    populateCurriculumFilter();
+    populateChapterFilter();
+    populateFeatureFilter();
     init();
 }
+

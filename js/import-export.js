@@ -1,7 +1,9 @@
 // Import/Export Functions
+// Dependencies: storage-core.js (storage), admin.js (showNotification), main.js (refreshViews)
 
 /**
  * Export database to JSON file
+ * Dependencies: storage-core.js (storage), admin.js (showNotification)
  */
 async function exportJSON() {
     try {
@@ -35,6 +37,7 @@ async function exportJSON() {
 
 /**
  * Import database from JSON file
+ * Dependencies: storage-core.js (storage), admin.js (showNotification), main.js (refreshViews)
  */
 async function importJSON() {
     const input = document.createElement('input');
@@ -95,6 +98,7 @@ async function importJSON() {
 
 /**
  * Clear entire database
+ * Dependencies: storage-core.js (storage), admin.js (showNotification), main.js (refreshViews)
  */
 async function clearDatabase() {
     if (!confirm('⚠️ 確定要清除所有資料？\n\n此操作無法復原！')) {
@@ -115,11 +119,3 @@ async function clearDatabase() {
     }
 }
 
-// Legacy function names for backward compatibility
-async function exportData() {
-    return await exportJSON();
-}
-
-async function importData() {
-    return await importJSON();
-}

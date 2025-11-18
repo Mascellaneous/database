@@ -1,4 +1,6 @@
 // Render questions
+// Dependencies: storage-core.js (storage), storage-filters.js (applyFilters), globals.js (paginationState, triStateFilters, window.percentageFilter), pagination.js (updatePaginationInfo, generatePagination), admin.js (isAdminMode), utils.js (copyToClipboard)
+
 async function renderQuestions() {
     const filters = {
         search: document.getElementById('search').value,
@@ -33,13 +35,13 @@ async function renderQuestions() {
         <div class="question-card">
             <div class="question-header">
                 <div class="question-title">
-                    ${q.id} - ${q.examination} ${q.year} ${q.section ? `卷${q.section}` : ''} ${q.questionNumber ? `第${q.questionNumber}題` : ''}
+                    ${q.id}
                 </div>
                 <div class="question-badges">
-                    <span class="badge badge-year">${q.year}</span>
-                    <span class="badge badge-type">${q.questionType}</span>
+                    ${q.year && q.year !== '-' ? `<span class="badge badge-year">${q.year}</span>` : ''}
+                    ${q.questionType && q.questionType !== '-' ? `<span class="badge badge-type">${q.questionType}</span>` : ''}
                     ${q.marks > 0 ? `<span class="badge badge-marks">${q.marks}分</span>` : ''}
-                    ${q.section ? `<span class="badge badge-section">卷${q.section}</span>` : ''}
+                    ${q.section && q.section !== '-' ? `<span class="badge badge-section">Section ${q.section}</span>` : ''}
                 </div>
             </div>
             
@@ -68,43 +70,53 @@ async function renderQuestions() {
                 ` : ''}
                 
                 <div class="question-info">
-                    ${q.publisher ? `<div class="info-item"><strong>出版商:</strong> ${q.publisher}</div>` : ''}
-                    ${q.multipleSelectionType !== '-' ? `<div class="info-item"><strong>多選題:</strong> ${q.multipleSelectionType}</div>` : ''}
-                    ${q.graphType !== '-' ? `<div class="info-item"><strong>圖表:</strong> ${q.graphType}</div>` : ''}
-                    ${q.tableType !== '-' ? `<div class="info-item"><strong>表格:</strong> ${q.tableType}</div>` : ''}
-                    ${q.correctPercentage !== null ? `<div class="info-item"><strong>答對率:</strong> ${q.correctPercentage}%</div>` : ''}
+                    ${q.publisher && q.publisher !== '-' ? `<div class="info-item"><strong>出版商：</strong> ${q.publisher}</div>` : ''}
+                    ${q.multipleSelectionType && q.multipleSelectionType !== '-' ? `<div class="info-item"><strong>複選：</strong> ${q.multipleSelectionType}</div>` : ''}
+                    ${q.graphType && q.graphType !== '-' ? `<div class="info-item"><strong>圖表：</strong> ${q.graphType}</div>` : ''}
+                    ${q.tableType && q.tableType !== '-' ? `<div class="info-item"><strong>表格：</strong> ${q.tableType}</div>` : ''}
+                    ${q.calculationType && q.calculationType !== '-' ? `<div class="info-item"><strong>計算類型：</strong> ${q.calculationType}</div>` : ''}
+                    ${q.correctPercentage !== null && q.correctPercentage !== undefined ? `<div class="info-item"><strong>答對率：</strong> ${q.correctPercentage}%</div>` : ''}
                 </div>
                 
-                ${q.answer ? `<div class="info-item"><strong>答案:</strong> ${q.answer}</div>` : ''}
-                
+                ${q.answer ? `<div class="info-item"><strong>答案：</strong> ${q.answer}</div>` : ''}
+                <div></div>
                 ${q.curriculumClassification && q.curriculumClassification.length > 0 ? `
-                    <div>
-                        <strong>課程分類:</strong>
-                        <div class="tag-container">
+                    <div style="display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
+                        <strong style="white-space: nowrap;">課程分類：</strong>
+                        <div class="tag-container" style="flex: 1; margin: 0;">
                             ${q.curriculumClassification.map(c => `<span class="tag">${c}</span>`).join('')}
                         </div>
                     </div>
                 ` : ''}
-                
+
+                ${q.AristochapterClassification && q.AristochapterClassification.length > 0 ? `
+                    <div style="display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
+                        <strong style="white-space: nowrap;">Chapters：</strong>
+                        <div class="tag-container" style="flex: 1; margin: 0;">
+                            ${q.AristochapterClassification.map(c => `<span class="tag">${c}</span>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}                
+
                 ${q.concepts && q.concepts.length > 0 ? `
-                    <div>
-                        <strong>涉及概念:</strong>
-                        <div class="tag-container">
+                    <div style="display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
+                        <strong style="white-space: nowrap;">涉及概念：</strong>
+                        <div class="tag-container" style="flex: 1; margin: 0;">
                             ${q.concepts.map(c => `<span class="tag">${c}</span>`).join('')}
                         </div>
                     </div>
                 ` : ''}
                 
                 ${q.patternTags && q.patternTags.length > 0 ? `
-                    <div>
-                        <strong>題型:</strong>
-                        <div class="tag-container">
+                    <div style="display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
+                        <strong style="white-space: nowrap;">題型：</strong>
+                        <div class="tag-container" style="flex: 1; margin: 0;">
                             ${q.patternTags.map(p => `<span class="tag">${p}</span>`).join('')}
                         </div>
                     </div>
-                ` : ''}
+                ` : ''} 
                 
-                ${q.markersReport ? `<div class="info-item" style="margin-top: 10px;"><strong>評卷報告:</strong> ${q.markersReport.substring(0, 150)}${q.markersReport.length > 150 ? '...' : ''}</div>` : ''}
+                ${q.markersReport ? `<div class="info-item" style="margin-top: 10px;"><strong>評卷報告：</strong> ${q.markersReport.substring(0, 150)}${q.markersReport.length > 150 ? '...' : ''}</div>` : ''}
             </div>
             
             ${isAdminMode ? `
@@ -117,20 +129,3 @@ async function renderQuestions() {
     `).join('');
 }
 
-// Copy to clipboard function
-function copyToClipboard(text, button) {
-    navigator.clipboard.writeText(text).then(() => {
-        // Change button text temporarily to show success
-        const originalText = button.innerHTML;
-        button.innerHTML = '✓';
-        button.style.backgroundColor = '#27ae60';
-        
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.style.backgroundColor = '';
-        }, 1500);
-    }).catch(err => {
-        console.error('Failed to copy:', err);
-        alert('複製失敗，請手動複製');
-    });
-}

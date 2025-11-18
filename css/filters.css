@@ -282,3 +282,106 @@ select:focus {
 .range-max {
     z-index: 4;
 }
+
+/* ============================================
+   Chapter Filter - Collapsible Grid
+   ============================================ */
+
+/* Dropdown section styling for consistency */
+.dropdown-section {
+    margin-bottom: var(--spacing-md);
+}
+
+.dropdown-section > strong {
+    display: block;
+    padding: 12px 16px;
+    background: var(--white-bg);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+    user-select: none;
+}
+
+.dropdown-section > strong:hover {
+    border-color: var(--border-focus);
+    background: #f5f5f5;
+}
+
+/* Chapter options grid */
+#chapter-options {
+    display: none; /* Hidden by default */
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    padding: 12px;
+    background: var(--white-bg);
+    border: 2px solid var(--border-light);
+    border-top: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    margin-top: -8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* When expanded, show as grid */
+#chapter-options[style*="display: grid"],
+#chapter-options[style*="display: block"] {
+    display: grid !important;
+}
+
+/* Chapter filter buttons - different styling from other tri-state */
+#chapter-options .tri-state-checkbox {
+    padding: 8px 4px;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    min-width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    transition: all 0.2s ease;
+    color: #666;
+}
+
+/* Remove ALL ::before and ::after content for chapter filters */
+#chapter-options .tri-state-checkbox::before,
+#chapter-options .tri-state-checkbox::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Checked state - green background with white text */
+#chapter-options .tri-state-checkbox.checked {
+    background: #27ae60;
+    color: white;
+    border-color: #229954;
+}
+
+/* Excluded state - red background with white text */
+#chapter-options .tri-state-checkbox.excluded {
+    background: #e74c3c;
+    color: white;
+    border-color: #c0392b;
+}
+
+/* Hover effect */
+#chapter-options .tri-state-checkbox:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Arrow indicator animation */
+#chapter-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    float: right;
+}

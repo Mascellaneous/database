@@ -1,4 +1,7 @@
+// Dependencies: globals.js (window.triStateFilters, window.paginationState, window.percentageFilter), render.js (renderQuestions)
+
 // Dropdown toggle
+// Dependencies: None
 function toggleDropdown(dropdownId) {
     const dropdown = document.getElementById(dropdownId);
     const allDropdowns = document.querySelectorAll('.dropdown-content');
@@ -14,7 +17,26 @@ function toggleDropdown(dropdownId) {
     dropdown.classList.toggle('active');
 }
 
+// Toggle collapsible sections (for Chapters, etc.)
+function toggleCollapsibleSection(sectionId, arrowId) {
+    const section = document.getElementById(sectionId);
+    const arrow = document.getElementById(arrowId);
+    
+    if (!section) return;
+    
+    const isHidden = section.style.display === 'none' || !section.style.display;
+    
+    if (isHidden) {
+        section.style.display = 'grid';
+        if (arrow) arrow.textContent = '▼';
+    } else {
+        section.style.display = 'none';
+        if (arrow) arrow.textContent = '▼';
+    }
+}
+
 // Close dropdowns when clicking outside
+// Dependencies: None
 document.addEventListener('click', function(event) {
     if (!event.target.closest('.dropdown-filter')) {
         document.querySelectorAll('.dropdown-content').forEach(d => {
@@ -24,6 +46,7 @@ document.addEventListener('click', function(event) {
 });
 
 // Tri-state filter toggle
+// Dependencies: globals.js (window.triStateFilters), render.js (filterQuestions)
 function toggleTriState(element) {
     const filter = element.dataset.filter;
     const value = element.dataset.value;
@@ -49,6 +72,7 @@ function toggleTriState(element) {
     filterQuestions();
 }
 
+// Dependencies: globals.js (window.triStateFilters, window.paginationState, window.percentageFilter), render.js (renderQuestions)
 function clearFilters() {
     document.getElementById('search').value = '';
     document.getElementById('exam-filter').value = '';
@@ -59,7 +83,7 @@ function clearFilters() {
     document.querySelectorAll('.tri-state-checkbox').forEach(el => {
         el.classList.remove('checked', 'excluded');
     });
-    window.triStateFilters = { curriculum: {}, feature: {} };
+    window.triStateFilters = { curriculum: {}, chapter: {}, feature: {} };
 
     // Reset percentage filter
     clearPercentageFilter();    
@@ -68,6 +92,7 @@ function clearFilters() {
     renderQuestions();
 }
 
+// Dependencies: globals.js (window.paginationState), render.js (renderQuestions)
 async function filterQuestions() {
     window.paginationState.questions.page = 1;
     await renderQuestions();
@@ -80,6 +105,7 @@ window.percentageFilter = {
     active: false
 };
 
+// Dependencies: globals.js (window.percentageFilter)
 function updateDualRange() {
     const minSlider = document.getElementById('min-percentage');
     const maxSlider = document.getElementById('max-percentage');
@@ -116,6 +142,7 @@ function updateDualRange() {
     window.percentageFilter.max = maxVal;
 }
 
+// Dependencies: globals.js (window.percentageFilter), render.js (filterQuestions)
 function applyPercentageFilter() {
     const minVal = parseInt(document.getElementById('min-percentage').value);
     const maxVal = parseInt(document.getElementById('max-percentage').value);
@@ -135,6 +162,7 @@ function applyPercentageFilter() {
     filterQuestions();
 }
 
+// Dependencies: globals.js (window.percentageFilter), render.js (filterQuestions)
 function clearPercentageFilter() {
     const minSlider = document.getElementById('min-percentage');
     const maxSlider = document.getElementById('max-percentage');

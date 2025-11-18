@@ -1,4 +1,7 @@
 // Form functions
+// Dependencies: globals.js (window.editingId), storage-core.js (window.storage), main.js (refreshViews)
+
+// Dependencies: globals.js (window.editingId)
 function toggleForm() {
     const form = document.getElementById('form-section');
     const isHidden = form.classList.contains('hidden');
@@ -13,6 +16,7 @@ function toggleForm() {
     }
 }
 
+// Dependencies: None
 function clearForm() {
     document.getElementById('question-form').reset();
     const publisherField = document.getElementById('publisher');
@@ -21,6 +25,7 @@ function clearForm() {
     }
 }
 
+// Dependencies: globals.js (window.editingId)
 function cancelEdit() {
     document.getElementById('form-section').classList.add('hidden');
     window.editingId = null;
@@ -28,6 +33,7 @@ function cancelEdit() {
 }
 
 // Save question
+// Dependencies: globals.js (window.editingId), storage-core.js (window.storage), main.js (refreshViews)
 function setupFormHandler() {
     const form = document.getElementById('question-form');
     if (!form) return;
@@ -45,6 +51,7 @@ function setupFormHandler() {
             publisher: document.getElementById('publisher').value.trim(),
             examination: document.getElementById('examination').value,
             year: parseInt(document.getElementById('year').value),
+            paper: document.getElementById('paper').value.trim(),
             questionType: document.getElementById('question-type').value,
             marks: parseFloat(document.getElementById('marks').value) || 0,
             section: document.getElementById('section').value.trim(),
@@ -54,6 +61,7 @@ function setupFormHandler() {
             multipleSelectionType: multipleSelectionType,
             graphType: graphType,
             tableType: tableType,
+            calculationType: document.getElementById('calculation-type').value.trim() || '-',            
             answer: document.getElementById('answer').value.trim(),
             correctPercentage: parseFloat(document.getElementById('correct-percentage').value) || null,
             markersReport: document.getElementById('markers-report').value.trim(),
@@ -85,6 +93,7 @@ function setupFormHandler() {
 
 
 // Edit question
+// Dependencies: globals.js (window.editingId), storage-core.js (window.storage)
 async function editQuestion(id) {
     const questions = await window.storage.getQuestions();
     const question = questions.find(q => q.id === id);
@@ -100,6 +109,7 @@ async function editQuestion(id) {
     document.getElementById('publisher').value = question.publisher || 'HKEAA';
     document.getElementById('examination').value = question.examination;
     document.getElementById('year').value = question.year;
+    document.getElementById('paper').value = question.paper || '';
     document.getElementById('question-type').value = question.questionType;
     document.getElementById('marks').value = question.marks || '';
     document.getElementById('section').value = question.section || '';
@@ -111,12 +121,12 @@ async function editQuestion(id) {
     document.getElementById('multiple-selection-type').value = question.multipleSelectionType === '-' ? '' : (question.multipleSelectionType || '');
     document.getElementById('graph-type').value = question.graphType === '-' ? '' : (question.graphType || '');
     document.getElementById('table-type').value = question.tableType === '-' ? '' : (question.tableType || '');
-    
+    document.getElementById('calculation-type').value = question.calculationType === '-' ? '' : (question.calculationType || '');    
     document.getElementById('answer').value = question.answer || '';
     document.getElementById('correct-percentage').value = question.correctPercentage || '';
     document.getElementById('markers-report').value = question.markersReport || '';
     document.getElementById('curriculum-classification').value = (question.curriculumClassification || []).join(', ');
-    document.getElementById('chapter-classification').value = (question.chapterClassification || []).join(', ');
+    document.getElementById('aristo-chapter-classification').value = (question.AristochapterClassification || []).join(', ');
     document.getElementById('concepts').value = (question.concepts || []).join(', ');
     document.getElementById('pattern-tags').value = (question.patternTags || []).join(', ');
     document.getElementById('option-design').value = question.optionDesign || '';
@@ -127,6 +137,7 @@ async function editQuestion(id) {
 }
 
 // Delete question
+// Dependencies: storage-core.js (window.storage), main.js (refreshViews)
 async function deleteQuestion(id) {
     if (confirm('確定要刪除此題目？')) {
         await window.storage.deleteQuestion(id);

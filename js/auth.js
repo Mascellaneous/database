@@ -1,4 +1,5 @@
 // Authentication and Authorization with Cookie Support
+// Dependencies: None (core authentication module)
 class AuthManager {
     constructor() {
         this.currentUser = null;
@@ -9,6 +10,7 @@ class AuthManager {
     }
     
     // Check if user is logged in (from cookie)
+    // Dependencies: None
     isAuthenticated() {
         const cookieData = this.getCookie(this.COOKIE_NAME);
         if (cookieData) {
@@ -27,6 +29,7 @@ class AuthManager {
     }
     
     // Save user credentials to cookie
+    // Dependencies: None
     saveUser(username, displayName, userGroup) {
         const userData = {
             username: username,
@@ -44,6 +47,7 @@ class AuthManager {
     }
     
     // Logout - clear cookie
+    // Dependencies: None
     logout() {
         this.deleteCookie(this.COOKIE_NAME);
         this.currentUser = null;
@@ -53,13 +57,17 @@ class AuthManager {
     }
     
     // Cookie helper functions
+    // Dependencies: None
     setCookie(name, value, days) {
         const date = new Date();
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         const expires = "expires=" + date.toUTCString();
-        document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/;SameSite=Strict";
+        // Remove SameSite=Strict if it's causing issues, or use Lax
+        document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/;SameSite=Lax";
+        console.log('🍪 Cookie saved:', name, 'expires in', days, 'days');
     }
     
+    // Dependencies: None
     getCookie(name) {
         const nameEQ = name + "=";
         const cookies = document.cookie.split(';');
@@ -72,20 +80,24 @@ class AuthManager {
         return null;
     }
     
+    // Dependencies: None
     deleteCookie(name) {
         document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
     }
     
     // Check permissions
+    // Dependencies: None
     canEdit() {
         return this.userGroup === 'Admin';
     }
 }
 
 // Initialize auth manager
+// Dependencies: None
 window.authManager = new AuthManager();
 
 // Show login modal
+// Dependencies: None
 function showLoginModal() {
     const modal = document.createElement('div');
     modal.id = 'login-modal';
@@ -128,7 +140,7 @@ function showLoginModal() {
             
             <button onclick="attemptLogin()" id="login-button"
                     style="width: 100%; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
-                登入
+                進入系統
             </button>
         </div>
     `;
@@ -168,6 +180,7 @@ function showLoginModal() {
 }
 
 // Attempt login
+// Dependencies: window.googleSheetsSync, window.authManager, storage-core.js (window.storage)
 async function attemptLogin() {
     const username = document.getElementById('username-input').value.trim().toLowerCase();
     const errorDiv = document.getElementById('login-error');
@@ -181,7 +194,7 @@ async function attemptLogin() {
     
     // Disable button during login
     loginBtn.disabled = true;
-    loginBtn.textContent = '登入中...';
+    loginBtn.textContent = '驗證中...';
     loginBtn.style.background = '#95a5a6';
     loginBtn.style.cursor = 'not-allowed';
     
@@ -211,7 +224,7 @@ async function attemptLogin() {
             
             // Re-enable button
             loginBtn.disabled = false;
-            loginBtn.textContent = '登入';
+            loginBtn.textContent = '驗證';
             loginBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
             loginBtn.style.cursor = 'pointer';
             return;
@@ -220,12 +233,12 @@ async function attemptLogin() {
         // Only proceed if login successful
         if (!result.success) {
             hideLoading();
-            errorDiv.innerHTML = '❌ 登入失敗';
+            errorDiv.innerHTML = '❌ 驗證失敗';
             errorDiv.style.display = 'block';
             
             // Re-enable button
             loginBtn.disabled = false;
-            loginBtn.textContent = '登入';
+            loginBtn.textContent = '驗證';
             loginBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
             loginBtn.style.cursor = 'pointer';
             return;
@@ -267,7 +280,7 @@ async function attemptLogin() {
         console.error('Login error:', error);
         
         // Better error messages
-        let errorMessage = '登入失敗';
+        let errorMessage = '驗證失敗';
         
         if (error.message.includes('JSON') || error.message.includes('Unexpected token')) {
             errorMessage = '使用者名稱錯誤或無權限';
@@ -282,13 +295,14 @@ async function attemptLogin() {
         
         // Re-enable button
         loginBtn.disabled = false;
-        loginBtn.textContent = '登入';
+        loginBtn.textContent = '驗證';
         loginBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
         loginBtn.style.cursor = 'pointer';
     }
 }
 
 // Show welcome message
+// Dependencies: None
 function showWelcomeMessage(displayName) {
     const welcome = document.createElement('div');
     welcome.style.cssText = `
@@ -310,7 +324,7 @@ function showWelcomeMessage(displayName) {
         <div style="display: flex; align-items: center; gap: 12px;">
             <div style="font-size: 28px;">👋</div>
             <div>
-                <div style="font-weight: bold; font-size: 16px; color: #2c3e50;">登入成功</div>
+                <div style="font-weight: bold; font-size: 16px; color: #2c3e50;">驗證成功</div>
                 <div style="font-size: 13px; color: #7f8c8d; margin-top: 2px;">
                     歡迎回來, ${displayName}
                 </div>
@@ -327,6 +341,7 @@ function showWelcomeMessage(displayName) {
 }
 
 // Load authenticated data
+// Dependencies: storage-core.js (window.storage), main.js (showLoading, hideLoading)
 async function loadAuthenticatedData(data) {
     try {
         showLoading('正在載入題目資料...');
@@ -338,7 +353,8 @@ async function loadAuthenticatedData(data) {
             throw new Error('資料為空');
         }
         
-        const headers = lines[0].split(String.fromCharCode(30));
+        // Headers are already the database field names from backend
+        const headers = lines[0].split(String.fromCharCode(30)).map(h => h.trim());
         const questions = [];
         
         for (let i = 1; i < lines.length; i++) {
@@ -348,72 +364,63 @@ async function loadAuthenticatedData(data) {
                 dateModified: new Date().toISOString()
             };
             
-            headers.forEach((header, index) => {
-                const trimmedHeader = header.trim();
-                const dbField = window.googleSheetsSync.columnMappings[trimmedHeader];
-                
-                if (!dbField) return;
-                
+            headers.forEach((fieldName, index) => {
                 let value = values[index] || '';
                 
                 if (!value) {
                     // Initialize array fields as empty arrays
-                    if (['curriculumClassification', 'chapterClassification', 'concepts', 'patternTags'].includes(dbField)) {
-                        question[dbField] = [];
+                    if (['curriculumClassification', 'chapterClassification', 'concepts', 'patternTags'].includes(fieldName)) {
+                        question[fieldName] = [];
                     }
                     return;
                 }
                 
-                // Process based on field type
-                switch (dbField) {
+                // Restore newlines
+                value = value.replace(/\\n/g, '\n');
+                
+                // Handle different field types
+                switch (fieldName) {
                     case 'year':
                     case 'marks':
                     case 'correctPercentage':
-                        const num = parseFloat(value.trim());
+                        const trimmedNum = value.trim();
+                        const num = parseFloat(trimmedNum);
                         if (!isNaN(num)) {
-                            question[dbField] = num;
+                            question[fieldName] = num;
                         }
                         break;
-                    
+                        
                     case 'curriculumClassification':
-                    case 'chapterClassification':
+                    case 'AristochapterClassification':
                     case 'concepts':
                     case 'patternTags':
-                        // Convert comma-separated strings to arrays
                         const trimmedValue = value.trim();
                         if (trimmedValue) {
-                            question[dbField] = trimmedValue.split(',').map(s => s.trim()).filter(s => s);
+                            question[fieldName] = trimmedValue.split(',').map(s => s.trim()).filter(s => s);
                         } else {
-                            question[dbField] = [];
+                            question[fieldName] = [];
                         }
                         break;
-                    
+                        
                     case 'multipleSelectionType':
                     case 'graphType':
                     case 'tableType':
-                        question[dbField] = value.trim() || '-';
-                        break;
-                    
-                    case 'questionTextChi':
-                    case 'questionTextEng':
-                    case 'markersReport':
-                    case 'remarks':
-                        // Preserve newlines
-                        question[dbField] = value.replace(/\\n/g, '\n').trim();
+                        question[fieldName] = value.trim() || '-';
                         break;
                     
                     default:
-                        question[dbField] = value.trim();
+                        question[fieldName] = value.trim();
                 }
             });
             
             // Ensure array fields exist
-            ['curriculumClassification', 'chapterClassification', 'concepts', 'patternTags'].forEach(field => {
+            ['curriculumClassification', 'AristochapterClassification', 'concepts', 'patternTags'].forEach(field => {
                 if (!question[field]) {
                     question[field] = [];
                 }
             });
             
+            // Validate required fields
             if (question.examination && question.id) {
                 questions.push(question);
             }
@@ -438,6 +445,7 @@ async function loadAuthenticatedData(data) {
 }
 
 // Initialize app after login
+// Dependencies: forms.js (setupFormHandler), filters.js (updateDualRange), main.js (populateYearFilter), render.js (renderQuestions), statistics.js (refreshStatistics)
 async function initializeApp() {
     try {
         console.log('🔧 初始化應用程式介面...');

@@ -1,4 +1,7 @@
 // Pagination
+// Dependencies: globals.js (paginationState), render.js (renderQuestions)
+
+// Dependencies: None
 function updatePaginationInfo(currentPage, totalItems, itemsPerPage) {
     const infoElement = document.getElementById('pagination-info-text');
     if (itemsPerPage === -1) {
@@ -10,6 +13,7 @@ function updatePaginationInfo(currentPage, totalItems, itemsPerPage) {
     }
 }
 
+// Dependencies: None
 function generatePagination(currentPage, totalPages) {
     const container = document.getElementById('pagination-buttons');
     let html = '';
@@ -47,11 +51,13 @@ function generatePagination(currentPage, totalPages) {
     container.innerHTML = html;
 }
 
+// Dependencies: globals.js (paginationState), render.js (renderQuestions)
 function goToPage(page) {
     paginationState.questions.page = page;
     renderQuestions();
 }
 
+// Dependencies: globals.js (paginationState), render.js (renderQuestions)
 function changeItemsPerPage(tab) {
     const select = document.getElementById('items-per-page');
     paginationState.questions.itemsPerPage = parseInt(select.value);

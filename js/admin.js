@@ -1,10 +1,12 @@
 // admin.js - Secure Admin Mode with Server-Side Verification
+// Dependencies: config.js (CONFIG.GOOGLE_APPS_SCRIPT_URL), render.js (renderQuestions)
 
 // Admin mode state
 let isAdminMode = false;
 
 /**
  * Hash a string using SHA-256
+ * Dependencies: None
  */
 async function hashPassword(password) {
     const msgBuffer = new TextEncoder().encode(password);
@@ -16,6 +18,7 @@ async function hashPassword(password) {
 
 /**
  * Verify password with Google Apps Script
+ * Dependencies: config.js (CONFIG.GOOGLE_APPS_SCRIPT_URL)
  */
 async function verifyPasswordWithServer(passwordHash) {
     try {
@@ -37,6 +40,7 @@ async function verifyPasswordWithServer(passwordHash) {
 
 /**
  * Toggle admin mode with password
+ * Dependencies: render.js (renderQuestions)
  */
 async function toggleAdminMode() {
     if (isAdminMode) {
@@ -83,6 +87,7 @@ async function toggleAdminMode() {
 
 /**
  * Update UI based on admin mode state
+ * Dependencies: None
  */
 function updateAdminUI() {
     const statusElement = document.getElementById('admin-status');
@@ -125,6 +130,7 @@ function updateAdminUI() {
 
 /**
  * Show notification message
+ * Dependencies: None
  */
 function showNotification(message, type = 'info') {
     let notification = document.getElementById('admin-notification');
@@ -167,6 +173,7 @@ function showNotification(message, type = 'info') {
 }
 
 // Add CSS animations
+// Dependencies: None
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -194,6 +201,7 @@ style.textContent = `
 document.head.appendChild(style);
 
 // Initialize admin UI on page load
+// Dependencies: None
 document.addEventListener('DOMContentLoaded', () => {
     updateAdminUI();
 });

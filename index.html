@@ -121,74 +121,25 @@
                                 課程分類 ▼
                             </button>
                             <div id="curriculum-dropdown" class="dropdown-content">
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="A 基本經濟概念" onclick="toggleTriState(this)"></span>
-                                    A 基本經濟概念
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="B 廠商與生產" onclick="toggleTriState(this)"></span>
-                                    B 廠商與生產
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="C 市場與價格" onclick="toggleTriState(this)"></span>
-                                    C 市場與價格
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="D 競爭與市場結構" onclick="toggleTriState(this)"></span>
-                                    D 競爭與市場結構
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="E 效率、公平和政府的角色" onclick="toggleTriState(this)"></span>
-                                    E 效率、公平和政府的角色
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="F 經濟表現的量度" onclick="toggleTriState(this)"></span>
-                                    F 經濟表現的量度
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="G 國民收入決定及價格水平" onclick="toggleTriState(this)"></span>
-                                    G 國民收入決定及價格水平
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="H 貨幣與銀行" onclick="toggleTriState(this)"></span>
-                                    H 貨幣與銀行
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="I 宏觀經濟問題和政府" onclick="toggleTriState(this)"></span>
-                                    I 宏觀經濟問題和政府
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="J 國際貿易和金融" onclick="toggleTriState(this)"></span>
-                                    J 國際貿易和金融
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="E1 選修單元一" onclick="toggleTriState(this)"></span>
-                                    E1 選修單元一
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="curriculum" data-value="E2 選修單元二" onclick="toggleTriState(this)"></span>
-                                    E2 選修單元二
-                                </label>
+                                <!-- Dynamically populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="dropdown-section">
+                            <strong onclick="toggleCollapsibleSection('chapter-options', 'chapter-arrow')" style="cursor: pointer;">
+                                Chapters <span id="chapter-arrow"> ▼</span>
+                            </strong>
+                            <div id="chapter-options" class="tri-state-options" style="display: none;">
+                                <!-- Dynamically populated by JavaScript -->
                             </div>
                         </div>
 
                         <div class="dropdown-filter">
-                            <button class="dropdown-btn" onclick="toggleDropdown('feature-dropdown')">
+                            <button onclick="toggleDropdown('feature-dropdown')" class="dropdown-btn">
                                 特徵 ▼
                             </button>
                             <div id="feature-dropdown" class="dropdown-content">
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="feature" data-value="含圖表" onclick="toggleTriState(this)"></span>
-                                    含圖表
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="feature" data-value="含表格" onclick="toggleTriState(this)"></span>
-                                    含表格
-                                </label>
-                                <label class="tri-state-label">
-                                    <span class="tri-state-checkbox" data-filter="feature" data-value="複選" onclick="toggleTriState(this)"></span>
-                                    複選
-                                </label>
+                                <!-- Dynamically populated by JavaScript -->
                             </div>
                         </div>
                     </div>
@@ -232,6 +183,11 @@
                             <div class="form-group">
                                 <label for="year">年份 *</label>
                                 <input type="number" id="year" required min="1990" max="2030">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="paper">試卷</label>
+                                <input type="text" id="paper" placeholder="例如：P1, P2">
                             </div>
 
                             <div class="form-group">
@@ -282,6 +238,16 @@
                             <div class="form-group">
                                 <label for="table-type">表格類型</label>
                                 <input type="text" id="table-type" placeholder="留空則自動填入 '-'">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="calculation-type">計算類型</label>
+                                <input type="text" id="calculation-type" placeholder="例如：百分比計算、彈性計算">
+                            </div>                            
+
+                            <div class="form-group">
+                                <label for="aristo-chapter-classification">Aristo Chapters (用逗號分隔)</label>
+                                <input type="text" id="aristo-chapter-classification" placeholder="例如：Ch01, Ch09, Ch11">
                             </div>
 
                             <div class="form-group">
@@ -391,6 +357,12 @@
                 <div id="topics-grid" class="stats-grid"></div>
             </div>
 
+            <!-- Chapters Tab -->
+            <div id="chapters-tab" class="tab-content">
+                <h2>Chapters統計</h2>
+                <div id="chapters-grid" class="stats-grid"></div>
+            </div>
+
             <!-- Concepts Tab -->
             <div id="concepts-tab" class="tab-content">
                 <h2>涉及概念統計</h2>
@@ -415,20 +387,28 @@
             <span id="admin-status" style="margin-left: 10px; color: #95a5a6; font-size: 12px;"></span>
         </div> 
 
-    <!-- Scripts -->
-    <script src="js/auth.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/admin.js"></script>
-    <script src="js/globals.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/filters.js"></script>
-    <script src="js/pagination.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/render.js"></script>
-    <script src="js/forms.js"></script>
-    <script src="js/statistics.js"></script>
-    <script src="js/tabs.js"></script>
-    <script src="js/import-export.js"></script>
-    <script src="js/main.js"></script>
+<!-- Core dependencies first -->
+<script src="js/globals.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+
+<!-- Storage layer -->
+<script src="js/storage-core.js"></script>
+<script src="js/storage-filters.js"></script>
+<script src="js/storage-sync.js"></script>
+
+<!-- UI components -->
+<script src="js/utils.js"></script>
+<script src="js/pagination.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/forms.js"></script>
+<script src="js/render.js"></script>
+<script src="js/statistics.js"></script>
+<script src="js/tabs.js"></script>
+<script src="js/import-export.js"></script>
+<script src="js/admin.js"></script>
+
+<!-- Main initialization last -->
+<script src="js/main.js"></script>
 </body>
 </html>

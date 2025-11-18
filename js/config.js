@@ -1,9 +1,12 @@
 // Configuration file for Google Sheets sync
+// Dependencies: storage-sync.js (GoogleSheetsSync)
+
 const CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwwihACzOkdFhcWsc5EFBaXUDAzmbHYN-NJ2ARO5ZqSRPdiPyOv6VOHQ4659-2eZedm/exec'
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzvSMOfaXHWb0e1jS78RcsdjxsqMT91QkE0iPqN1tFoWZiOzuLhDV3e9PXqxWkUjLg_/exec'
 };
 
 // Initialize sync on page load
+// Dependencies: storage-sync.js (GoogleSheetsSync)
 window.addEventListener('DOMContentLoaded', async () => {
     if (CONFIG.GOOGLE_APPS_SCRIPT_URL && CONFIG.GOOGLE_APPS_SCRIPT_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
         window.googleSheetsSync = new GoogleSheetsSync(CONFIG.GOOGLE_APPS_SCRIPT_URL);

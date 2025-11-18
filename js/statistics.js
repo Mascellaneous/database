@@ -1,4 +1,6 @@
 // Statistics functions
+// Dependencies: storage-core.js (window.storage)
+
 const CURRICULUM_NAMES = {
     'A 基本經濟概念': 'A',
     'B 廠商與生產': 'B',
@@ -31,6 +33,7 @@ const CURRICULUM_DISPLAY = {
 };
 
 // Get curriculum sort key (extracts letter/code from full name)
+// Dependencies: None
 function getCurriculumSortKey(topic) {
     // If it's already just a letter (A, B, C...), return it
     if (topic.match(/^[A-J]$|^E[12]$/)) {
@@ -42,6 +45,7 @@ function getCurriculumSortKey(topic) {
     return match ? match[1] : topic;
 }
 
+// Dependencies: storage-core.js (window.storage)
 async function renderPublishers() {
     const questions = await window.storage.getQuestions();
     const stats = {};
@@ -71,6 +75,7 @@ async function renderPublishers() {
         `).join('');
 }
 
+// Dependencies: storage-core.js (window.storage)
 async function renderTopics() {
     const questions = await window.storage.getQuestions();
     const stats = {};
@@ -109,6 +114,51 @@ async function renderTopics() {
         `).join('');
 }
 
+// Dependencies: storage-core.js (window.storage)
+async function renderChapters() {
+    const questions = await window.storage.getQuestions();
+    const stats = {};
+    
+    questions.forEach(q => {
+        if (q.AristochapterClassification && Array.isArray(q.AristochapterClassification)) {
+            q.AristochapterClassification.forEach(chapter => {
+                if (!stats[chapter]) {
+                    stats[chapter] = { total: 0, mc: 0, text: 0 };
+                }
+                stats[chapter].total++;
+                if (q.questionType === 'MC') stats[chapter].mc++;
+                if (q.questionType === '文字題 (SQ/LQ)') stats[chapter].text++;
+            });
+        }
+    });
+    
+    const grid = document.getElementById('chapters-grid');
+    
+    if (Object.keys(stats).length === 0) {
+        grid.innerHTML = '<p class="empty-state">暫無章節資料</p>';
+        return;
+    }
+    
+    grid.innerHTML = Object.entries(stats)
+        .sort((a, b) => {
+            // Sort by chapter number (Ch01, Ch02, ..., Ch29)
+            const numA = parseInt(a[0].replace('Ch', ''));
+            const numB = parseInt(b[0].replace('Ch', ''));
+            return numA - numB;
+        })
+        .map(([chapter, data]) => `
+            <div class="stat-card">
+                <h3>${chapter}</h3>
+                <div class="stat-details">
+                    <div>總題目: ${data.total}</div>
+                    <div>MC: ${data.mc}</div>
+                    <div>文字題: ${data.text}</div>
+                </div>
+            </div>
+        `).join('');
+}
+
+// Dependencies: storage-core.js (window.storage)
 async function renderConcepts() {
     const questions = await window.storage.getQuestions();
     const stats = {};
@@ -147,6 +197,7 @@ async function renderConcepts() {
         `).join('');
 }
 
+// Dependencies: storage-core.js (window.storage)
 async function renderPatterns() {
     const questions = await window.storage.getQuestions();
     const stats = {};
@@ -185,9 +236,11 @@ async function renderPatterns() {
         `).join('');
 }
 
+// Dependencies: None (calls all render functions)
 async function refreshStatistics() {
     await renderPublishers();
     await renderTopics();
+    await renderChapters();
     await renderConcepts();
     await renderPatterns();
 }
