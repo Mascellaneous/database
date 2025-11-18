@@ -32,9 +32,6 @@ header p {
 
 /* Storage Status Indicator */
 #storage-status {
-    position: absolute;
-    top: var(--spacing-xl);
-    left: var(--spacing-xl);
     background: rgba(255, 255, 255, 0.95);
     padding: 10px 20px;
     border-radius: var(--radius-pill);

@@ -43,10 +43,10 @@ async function init() {
     
     try {
         await window.storage.init();
-        updateStorageStatus('connected', '✓ 資料庫已連接');
+        console.log('✅ IndexedDB 已初始化');
     } catch (error) {
         console.error('Failed to initialize storage:', error);
-        updateStorageStatus('disconnected', '✗ 資料庫連接失敗');
+        updateStorageStatus('disconnected', '✗ 資料庫初始化失敗');
         showLoadingState(false);
         return; // Stop if storage fails
     }
@@ -55,11 +55,13 @@ async function init() {
     if (window.googleSheetsSync) {
         try {
             console.log('📥 開始從 Google Sheets 載入資料...');
+            updateStorageStatus('loading', '⏳ 載入資料中...');
             const result = await window.googleSheetsSync.syncOnLoad();
             
             if (result.success) {
                 console.log('✅ Google Sheets 資料載入完成');
                 console.log(`📊 載入 ${result.count} 題`);
+                updateStorageStatus('connected', `✓ 資料載入完成`);
             }
         } catch (error) {
             console.error('Failed to sync on load:', error);
