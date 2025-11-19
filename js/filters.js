@@ -83,7 +83,7 @@ function clearFilters() {
     document.querySelectorAll('.tri-state-checkbox').forEach(el => {
         el.classList.remove('checked', 'excluded');
     });
-    window.triStateFilters = { curriculum: {}, chapter: {}, feature: {} };
+    window.triStateFilters = { curriculum: {}, chapter: {}, feature: {}, exam: {}, qtype: {} };
 
     // Reset percentage filter
     clearPercentageFilter();    

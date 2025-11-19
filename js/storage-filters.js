@@ -58,6 +58,34 @@ IndexedDBStorage.prototype.applyFilters = function(questions, filters) {
 
     // Tri-state filters
     if (filters.triState) {
+        // Exam type filters
+        if (filters.triState.exam) {
+            const checkedExams = Object.keys(filters.triState.exam).filter(k => filters.triState.exam[k] === 'checked');
+            const excludedExams = Object.keys(filters.triState.exam).filter(k => filters.triState.exam[k] === 'excluded');
+            
+            if (checkedExams.length > 0) {
+                questions = questions.filter(q => checkedExams.includes(q.examination));
+            }
+            
+            if (excludedExams.length > 0) {
+                questions = questions.filter(q => !excludedExams.includes(q.examination));
+            }
+        }
+
+        // Question type filters
+        if (filters.triState.qtype) {
+            const checkedQtypes = Object.keys(filters.triState.qtype).filter(k => filters.triState.qtype[k] === 'checked');
+            const excludedQtypes = Object.keys(filters.triState.qtype).filter(k => filters.triState.qtype[k] === 'excluded');
+            
+            if (checkedQtypes.length > 0) {
+                questions = questions.filter(q => checkedQtypes.includes(q.questionType));
+            }
+            
+            if (excludedQtypes.length > 0) {
+                questions = questions.filter(q => !excludedQtypes.includes(q.questionType));
+            }
+        }
+
         // Curriculum filters
         if (filters.triState.curriculum) {
             const checkedCurr = Object.keys(filters.triState.curriculum).filter(k => filters.triState.curriculum[k] === 'checked');

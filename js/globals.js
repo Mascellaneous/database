@@ -4,7 +4,10 @@ var currentTab = 'questions';
 var editingId = null;
 var triStateFilters = {
     curriculum: {},
-    feature: {}
+    feature: {},
+    chapter: {},
+    exam: {},
+    qtype: {} 
 };
 
 var paginationState = {

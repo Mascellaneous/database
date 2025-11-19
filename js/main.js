@@ -232,10 +232,21 @@ function switchTab(tabName) {
 // Event listeners
 // Dependencies: filters.js (filterQuestions)
 function setupEventListeners() {
-    document.getElementById('search').addEventListener('input', debounce(filterQuestions, 300));
-    document.getElementById('exam-filter').addEventListener('change', filterQuestions);
-    document.getElementById('year-filter').addEventListener('change', filterQuestions);
-    document.getElementById('qtype-filter').addEventListener('change', filterQuestions);
+    // Search input
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(filterQuestions, 300));
+    }
+    
+    // Year filter (this is still a <select> element)
+    const yearFilter = document.getElementById('year-filter');
+    if (yearFilter) {
+        yearFilter.addEventListener('change', filterQuestions);
+    }
+    
+    // Note: Exam type and Question type are now tri-state dropdowns
+    // They trigger filterQuestions via onclick="toggleTriState(this)" in the HTML
+    // No event listeners needed here for those
     
     // Scroll to top button
     window.addEventListener('scroll', () => {

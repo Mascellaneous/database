@@ -61,10 +61,9 @@ function populateCurriculumFilter() {
     let html = '';
     CURRICULUM_ITEMS.forEach(item => {
         html += `
-            <label class="tri-state-label">
-                <span class="tri-state-checkbox" data-filter="curriculum" data-value="${item}" onclick="toggleTriState(this)"></span>
-                ${item}
-            </label>
+            <div class="tri-state-checkbox" data-filter="curriculum" data-value="${item}" onclick="toggleTriState(this)">
+                <span>${item}</span>
+            </div>
         `;
     });
     
@@ -81,10 +80,9 @@ function populateFeatureFilter() {
     let html = '';
     FEATURE_ITEMS.forEach(item => {
         html += `
-            <label class="tri-state-label">
-                <span class="tri-state-checkbox" data-filter="feature" data-value="${item}" onclick="toggleTriState(this)"></span>
-                ${item}
-            </label>
+            <div class="tri-state-checkbox" data-filter="feature" data-value="${item}" onclick="toggleTriState(this)">
+                <span>${item}</span>
+            </div>
         `;
     });
     

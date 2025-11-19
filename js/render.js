@@ -4,9 +4,7 @@
 async function renderQuestions() {
     const filters = {
         search: document.getElementById('search').value,
-        examination: document.getElementById('exam-filter').value,
         year: document.getElementById('year-filter').value,
-        questionType: document.getElementById('qtype-filter').value,
         triState: triStateFilters,
         percentageFilter: window.percentageFilter 
     };

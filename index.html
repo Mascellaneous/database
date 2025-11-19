@@ -37,22 +37,42 @@
                 <div class="filters">
                     <input type="text" id="search" placeholder="🔍 搜尋題目...">
                     
-                    <select id="exam-filter">
-                        <option value="HKDSE">HKDSE</option>
-                        <option value="">考試：全部</option>
-                        <option value="HKCEE">HKCEE</option>
-                        <option value="HKALE">HKALE</option>
-                    </select>
-                    
-                    <select id="year-filter">
-                        <option value="">年份：全部年份</option>
-                    </select>
-                    
-                    <select id="qtype-filter">
-                        <option value="">題目類型：全部</option>
-                        <option value="MC">MC</option>
-                        <option value="文字題 (SQ/LQ)">文字題 (SQ/LQ)</option>
-                    </select>
+                <!-- Exam Type Tri-State Filter -->
+                <div class="dropdown-filter">
+                    <button class="dropdown-btn" onclick="toggleDropdown('exam-dropdown')">
+                        考試類型 ▼
+                    </button>
+                    <div id="exam-dropdown" class="dropdown-content">
+                        <div class="tri-state-checkbox" data-filter="exam" data-value="HKDSE" onclick="toggleTriState(this)">
+                            <span>HKDSE</span>
+                        </div>
+                        <div class="tri-state-checkbox" data-filter="exam" data-value="HKCEE" onclick="toggleTriState(this)">
+                            <span>HKCEE</span>
+                        </div>
+                        <div class="tri-state-checkbox" data-filter="exam" data-value="HKALE" onclick="toggleTriState(this)">
+                            <span>HKALE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <select id="year-filter" onchange="filterQuestions()">
+                    <option value="">年份：全部年份</option>
+                </select>
+
+                <!-- Question Type Tri-State Filter -->
+                <div class="dropdown-filter">
+                    <button class="dropdown-btn" onclick="toggleDropdown('qtype-dropdown')">
+                        題目類型 ▼
+                    </button>
+                    <div id="qtype-dropdown" class="dropdown-content">
+                        <div class="tri-state-checkbox" data-filter="qtype" data-value="MC" onclick="toggleTriState(this)">
+                            <span>MC</span>
+                        </div>
+                        <div class="tri-state-checkbox" data-filter="qtype" data-value="文字題 (SQ/LQ)" onclick="toggleTriState(this)">
+                            <span>文字題 (SQ/LQ)</span>
+                        </div>
+                    </div>
+                </div>
                     
                     <button class="btn btn-clear-filter" onclick="clearFilters()">清除篩選</button>
                 </div>
