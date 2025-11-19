@@ -75,7 +75,7 @@ async function renderQuestions() {
                             <button class="expand-btn" onclick="toggleQuestionText(this)" title="展開/收起">
                                 ▶
                             </button>
-                            <strong style="flex: 1;">題目 (中):</strong>
+                            <strong style="flex: 1;">題目 (中)：</strong>
                             <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.questionTextChi).replace(/"/g, '&quot;')}, this)" title="複製" style="flex-shrink: 0;">
                                 📋
                             </button>

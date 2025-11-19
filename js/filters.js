@@ -4,17 +4,33 @@
 // Dependencies: None
 function toggleDropdown(dropdownId) {
     const dropdown = document.getElementById(dropdownId);
+    
+    // Get all dropdown content elements
     const allDropdowns = document.querySelectorAll('.dropdown-content');
     
-    // Close other dropdowns
+    // Also specifically target chapter-options if it exists
+    const chapterOptions = document.getElementById('chapter-options');
+    
+    // Close all other dropdowns
     allDropdowns.forEach(d => {
         if (d.id !== dropdownId) {
             d.classList.remove('active');
         }
     });
     
+    // Close chapter options if it's not the one being toggled
+    if (chapterOptions && dropdownId !== 'chapter-options') {
+        chapterOptions.style.display = 'none';
+        const chapterArrow = document.getElementById('chapter-arrow');
+        if (chapterArrow) {
+            chapterArrow.textContent = '▶';
+        }
+    }
+    
     // Toggle current dropdown
-    dropdown.classList.toggle('active');
+    if (dropdown) {
+        dropdown.classList.toggle('active');
+    }
 }
 
 // Toggle collapsible sections (for Chapters, etc.)
@@ -75,9 +91,7 @@ function toggleTriState(element) {
 // Dependencies: globals.js (window.triStateFilters, window.paginationState, window.percentageFilter), render.js (renderQuestions)
 function clearFilters() {
     document.getElementById('search').value = '';
-    document.getElementById('exam-filter').value = '';
     document.getElementById('year-filter').value = '';
-    document.getElementById('qtype-filter').value = '';
     
     // Reset tri-state filters
     document.querySelectorAll('.tri-state-checkbox').forEach(el => {
@@ -153,10 +167,6 @@ function applyPercentageFilter() {
         max: maxVal,
         active: (minVal > 0 || maxVal < 100)
     };
-    
-    if (window.percentageFilter.active) {
-        console.log(`📊 Filtering by 答對率: ${minVal}% - ${minVal}%`);
-    }
     
     // Trigger filter update
     filterQuestions();
