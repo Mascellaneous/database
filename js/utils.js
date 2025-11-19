@@ -18,6 +18,26 @@ function copyToClipboard(text, button) {
     });
 }
 
+// Toggle question text expand/collapse
+// Dependencies: None
+function toggleQuestionText(button) {
+    const textContent = button.parentElement.nextElementSibling;
+    const isCollapsed = textContent.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+        textContent.classList.remove('collapsed');
+        textContent.classList.add('expanded');
+        button.innerHTML = '▼';
+        button.title = '收起';
+    } else {
+        textContent.classList.remove('expanded');
+        textContent.classList.add('collapsed');
+        button.innerHTML = '▶';
+        button.title = '展開';
+    }
+}
+
+
 // Populate chapter filter options dynamically
 // Dependencies: constants.js (CHAPTER_RANGE)
 function populateChapterFilter() {

@@ -1,5 +1,5 @@
 // Render questions
-// Dependencies: storage-core.js (storage), storage-filters.js (applyFilters), globals.js (paginationState, triStateFilters, window.percentageFilter), pagination.js (updatePaginationInfo, generatePagination), admin.js (isAdminMode), utils.js (copyToClipboard), sort.js
+// Dependencies: storage-core.js (storage), storage-filters.js (applyFilters), globals.js (paginationState, triStateFilters, window.percentageFilter), pagination.js (updatePaginationInfo, generatePagination), admin.js (isAdminMode), utils.js (copyToClipboard, toggleQuestionText), sort.js
 
 async function renderQuestions() {
     const filters = {
@@ -54,28 +54,33 @@ async function renderQuestions() {
                 ${q.questionTextChi ? `
                     <div class="question-text">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                            <button class="expand-btn" onclick="toggleQuestionText(this)" title="展開/收起">
+                                ▶
+                            </button>
                             <strong>題目 (中):</strong>
                             <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.questionTextChi).replace(/"/g, '&quot;')}, this)" title="複製">
                                 📋
                             </button>
                         </div>
-                        <div>${q.questionTextChi.substring(0, 200)}${q.questionTextChi.length > 200 ? '...' : ''}</div>
+                        <div class="question-text-content collapsed">${q.questionTextChi.trim()}</div>
                     </div>
                 ` : ''}
                 ${q.questionTextEng ? `
                     <div class="question-text">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                            <button class="expand-btn" onclick="toggleQuestionText(this)" title="Expand/Collapse">
+                                ▶
+                            </button>
                             <strong>Question (Eng):</strong>
                             <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.questionTextEng).replace(/"/g, '&quot;')}, this)" title="Copy">
                                 📋
                             </button>
                         </div>
-                        <div>${q.questionTextEng.substring(0, 200)}${q.questionTextEng.length > 200 ? '...' : ''}</div>
+                        <div class="question-text-content collapsed">${q.questionTextEng.trim()}</div>
                     </div>
                 ` : ''}
                 
                 <div class="question-info">
-                    ${'' /* q.publisher && q.publisher !== '-' ? `<div class="info-item"><strong>出版商：</strong> ${q.publisher}</div>` : '' */ }
                     ${q.multipleSelectionType && q.multipleSelectionType !== '-' ? `<div class="info-item"><strong>複選：</strong> ${q.multipleSelectionType}</div>` : ''}
                     ${q.graphType && q.graphType !== '-' ? `<div class="info-item"><strong>圖表：</strong> ${q.graphType}</div>` : ''}
                     ${q.tableType && q.tableType !== '-' ? `<div class="info-item"><strong>表格：</strong> ${q.tableType}</div>` : ''}
@@ -83,7 +88,20 @@ async function renderQuestions() {
                     ${q.correctPercentage !== null && q.correctPercentage !== undefined ? `<div class="info-item"><strong>答對率：</strong> ${q.correctPercentage}%</div>` : ''}
                 </div>
                 
-                ${q.answer ? `<div class="info-item"><strong>答案：</strong> ${q.answer}</div>` : ''}
+                ${q.answer ? `
+                    <div class="question-text">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                            <button class="expand-btn" onclick="toggleQuestionText(this)" title="展開/收起">
+                                ▶
+                            </button>
+                            <strong>答案：</strong>
+                            <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.answer).replace(/"/g, '&quot;')}, this)" title="複製答案">
+                                📋
+                            </button>
+                        </div>
+                        <div class="question-text-content collapsed">${q.answer.trim()}</div>
+                    </div>
+                ` : ''}
                 <div></div>
                 ${q.curriculumClassification && q.curriculumClassification.length > 0 ? `
                     <div style="display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
@@ -133,4 +151,3 @@ async function renderQuestions() {
         </div>
     `).join('');
 }
-
