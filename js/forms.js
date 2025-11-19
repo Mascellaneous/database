@@ -1,7 +1,7 @@
 // Form functions
-// Dependencies: globals.js (window.editingId), storage-core.js (window.storage), main.js (refreshViews)
+// Dependencies: globals.js (window.editingId), storage-core.js (window.storage), main.js (refreshViews), constants.js (DEFAULT_PUBLISHER)
 
-// Dependencies: globals.js (window.editingId)
+// Dependencies: globals.js (window.editingId), constants.js (DEFAULT_PUBLISHER)
 function toggleForm() {
     const form = document.getElementById('form-section');
     const isHidden = form.classList.contains('hidden');
@@ -16,12 +16,12 @@ function toggleForm() {
     }
 }
 
-// Dependencies: None
+// Dependencies: constants.js (DEFAULT_PUBLISHER)
 function clearForm() {
     document.getElementById('question-form').reset();
     const publisherField = document.getElementById('publisher');
     if (publisherField) {
-        publisherField.value = 'HKEAA';
+        publisherField.value = DEFAULT_PUBLISHER;
     }
 }
 
@@ -30,6 +30,19 @@ function cancelEdit() {
     document.getElementById('form-section').classList.add('hidden');
     window.editingId = null;
     clearForm();
+}
+
+// Check for duplicate questions
+// Dependencies: storage-core.js (window.storage)
+async function checkDuplicate(formData) {
+    const questions = await window.storage.getQuestions();
+    return questions.some(q => 
+        q.examination === formData.examination &&
+        q.year === formData.year &&
+        q.section === formData.section &&
+        q.questionNumber === formData.questionNumber &&
+        q.id !== window.editingId // Don't count self when editing
+    );
 }
 
 // Save question
@@ -79,7 +92,23 @@ function setupFormHandler() {
             alert('請輸入題目 ID');
             return;
         }
-        
+
+        // Check for duplicates (only when adding new questions)
+        if (!window.editingId) {
+            const isDuplicate = await checkDuplicate(question);
+            if (isDuplicate) {
+                const confirmMsg = `已存在相同的題目：\n\n` +
+                                 `考試: ${question.examination}\n` +
+                                 `年份: ${question.year}\n` +
+                                 `Section: ${question.section}\n` +
+                                 `題號: ${question.questionNumber}\n\n` +
+                                 `確定要新增嗎？`;
+                if (!confirm(confirmMsg)) {
+                    return;
+                }
+            }
+        }        
+
         await window.storage.addQuestion(question);
         await refreshViews();
         
@@ -93,7 +122,7 @@ function setupFormHandler() {
 
 
 // Edit question
-// Dependencies: globals.js (window.editingId), storage-core.js (window.storage)
+// Dependencies: globals.js (window.editingId), storage-core.js (window.storage), constants.js (DEFAULT_PUBLISHER)
 async function editQuestion(id) {
     const questions = await window.storage.getQuestions();
     const question = questions.find(q => q.id === id);
@@ -106,7 +135,7 @@ async function editQuestion(id) {
     window.editingId = id;
     
     document.getElementById('question-id').value = question.id;
-    document.getElementById('publisher').value = question.publisher || 'HKEAA';
+    document.getElementById('publisher').value = question.publisher || DEFAULT_PUBLISHER;
     document.getElementById('examination').value = question.examination;
     document.getElementById('year').value = question.year;
     document.getElementById('paper').value = question.paper || '';

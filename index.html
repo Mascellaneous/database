@@ -147,6 +147,20 @@
                     </div>
                 </div>
 
+                <!-- Add after filter controls, before questions list -->
+                <div class="sort-controls">
+                    <label for="sort-order">排序方式：</label>
+                    <select id="sort-order" onchange="refreshViews()">
+                        <option value="default">預設 (年份新→舊，題號小→大)</option>
+                        <option value="year-desc">年份 (新→舊)</option>
+                        <option value="year-asc">年份 (舊→新)</option>
+                        <option value="question-asc">題號 (小→大)</option>
+                        <option value="question-desc">題號 (大→小)</option>
+                        <option value="marks-asc">分數 (低→高)</option>
+                        <option value="marks-desc">分數 (高→低)</option>
+                     </select>
+                </div>            
+
                 <!-- Question Count and Actions -->
                 <div class="action-bar">
                     <h2 id="question-count">總題目數: 0</h2>
@@ -383,6 +397,7 @@
 
 <!-- Core dependencies first -->
 <script src="js/globals.js"></script>
+<script src="js/constants.js"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
 
@@ -396,6 +411,7 @@
 <script src="js/pagination.js"></script>
 <script src="js/filters.js"></script>
 <script src="js/forms.js"></script>
+<script src="js/sort.js"></script>
 <script src="js/render.js"></script>
 <script src="js/statistics.js"></script>
 <script src="js/tabs.js"></script>

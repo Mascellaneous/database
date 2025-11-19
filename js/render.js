@@ -1,5 +1,5 @@
 // Render questions
-// Dependencies: storage-core.js (storage), storage-filters.js (applyFilters), globals.js (paginationState, triStateFilters, window.percentageFilter), pagination.js (updatePaginationInfo, generatePagination), admin.js (isAdminMode), utils.js (copyToClipboard)
+// Dependencies: storage-core.js (storage), storage-filters.js (applyFilters), globals.js (paginationState, triStateFilters, window.percentageFilter), pagination.js (updatePaginationInfo, generatePagination), admin.js (isAdminMode), utils.js (copyToClipboard), sort.js
 
 async function renderQuestions() {
     const filters = {
@@ -11,8 +11,13 @@ async function renderQuestions() {
         percentageFilter: window.percentageFilter 
     };
     
-    const questions = await storage.getQuestions(filters);
-    
+    let questions = await storage.getQuestions(filters);
+
+    // Get sort order and apply sorting
+    const sortSelect = document.getElementById('sort-order');
+    const sortBy = sortSelect ? sortSelect.value : 'default';
+    questions = sortQuestions(questions, sortBy);    
+
     const currentPage = paginationState.questions.page;
     const itemsPerPage = paginationState.questions.itemsPerPage;
     

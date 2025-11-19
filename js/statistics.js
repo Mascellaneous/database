@@ -1,36 +1,5 @@
 // Statistics functions
-// Dependencies: storage-core.js (window.storage)
-
-const CURRICULUM_NAMES = {
-    'A 基本經濟概念': 'A',
-    'B 廠商與生產': 'B',
-    'C 市場與價格': 'C',
-    'D 競爭與市場結構': 'D',
-    'E 效率、公平和政府的角色': 'E',
-    'F 經濟表現的量度': 'F',
-    'G 國民收入決定及價格水平': 'G',
-    'H 貨幣與銀行': 'H',
-    'I 宏觀經濟問題和政府': 'I',
-    'J 國際貿易和金融': 'J',
-    'E1 選修單元一': 'E1',
-    'E2 選修單元二': 'E2'
-};
-
-// Reverse mapping for display
-const CURRICULUM_DISPLAY = {
-    'A': 'A 基本經濟概念',
-    'B': 'B 廠商與生產',
-    'C': 'C 市場與價格',
-    'D': 'D 競爭與市場結構',
-    'E': 'E 效率、公平和政府的角色',
-    'F': 'F 經濟表現的量度',
-    'G': 'G 國民收入決定及價格水平',
-    'H': 'H 貨幣與銀行',
-    'I': 'I 宏觀經濟問題和政府',
-    'J': 'J 國際貿易和金融',
-    'E1': 'E1 選修單元一',
-    'E2': 'E2 選修單元二'
-};
+// Dependencies: storage-core.js (window.storage), constants.js (CURRICULUM_NAMES, CURRICULUM_DISPLAY, CURRICULUM_ORDER)
 
 // Get curriculum sort key (extracts letter/code from full name)
 // Dependencies: None
@@ -44,6 +13,7 @@ function getCurriculumSortKey(topic) {
     const match = topic.match(/^([A-J]|E[12])\s/);
     return match ? match[1] : topic;
 }
+
 
 // Dependencies: storage-core.js (window.storage)
 async function renderPublishers() {
@@ -75,7 +45,7 @@ async function renderPublishers() {
         `).join('');
 }
 
-// Dependencies: storage-core.js (window.storage)
+// Dependencies: storage-core.js (window.storage), constants.js (CURRICULUM_ORDER)
 async function renderTopics() {
     const questions = await window.storage.getQuestions();
     const stats = {};
@@ -96,11 +66,10 @@ async function renderTopics() {
     const grid = document.getElementById('topics-grid');
     grid.innerHTML = Object.entries(stats)
         .sort((a, b) => {
-            // Sort by curriculum order
-            const order = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'E1', 'E2'];
+            // Sort by curriculum order using constants
             const keyA = getCurriculumSortKey(a[0]);
             const keyB = getCurriculumSortKey(b[0]);
-            return order.indexOf(keyA) - order.indexOf(keyB);
+            return CURRICULUM_ORDER.indexOf(keyA) - CURRICULUM_ORDER.indexOf(keyB);
         })
         .map(([topic, data]) => `
             <div class="stat-card">
