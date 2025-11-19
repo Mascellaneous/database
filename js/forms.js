@@ -79,7 +79,7 @@ function setupFormHandler() {
             correctPercentage: parseFloat(document.getElementById('correct-percentage').value) || null,
             markersReport: document.getElementById('markers-report').value.trim(),
             curriculumClassification: document.getElementById('curriculum-classification').value.split(',').map(s => s.trim()).filter(s => s),
-            chapterClassification: document.getElementById('chapter-classification').value.split(',').map(s => s.trim()).filter(s => s),
+            AristochapterClassification: document.getElementById('chapter-classification').value.split(',').map(s => s.trim()).filter(s => s),
             concepts: document.getElementById('concepts').value.split(',').map(s => s.trim()).filter(s => s),
             patternTags: document.getElementById('pattern-tags').value.split(',').map(s => s.trim()).filter(s => s),
             optionDesign: document.getElementById('option-design').value.trim(),
@@ -155,7 +155,7 @@ async function editQuestion(id) {
     document.getElementById('correct-percentage').value = question.correctPercentage || '';
     document.getElementById('markers-report').value = question.markersReport || '';
     document.getElementById('curriculum-classification').value = (question.curriculumClassification || []).join(', ');
-    document.getElementById('aristo-chapter-classification').value = (question.AristochapterClassification || []).join(', ');
+    document.getElementById('chapter-classification').value = (question.AristochapterClassification || []).join(', ');
     document.getElementById('concepts').value = (question.concepts || []).join(', ');
     document.getElementById('pattern-tags').value = (question.patternTags || []).join(', ');
     document.getElementById('option-design').value = question.optionDesign || '';

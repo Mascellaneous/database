@@ -1,5 +1,5 @@
 // Render questions
-// Dependencies: storage-core.js (storage), storage-filters.js (applyFilters), globals.js (paginationState, triStateFilters, window.percentageFilter), pagination.js (updatePaginationInfo, generatePagination), admin.js (isAdminMode), utils.js (copyToClipboard, toggleQuestionText), sort.js
+// Dependencies: storage-core.js (storage), storage-filters.js (applyFilters), globals.js (paginationState, triStateFilters, window.percentageFilter), pagination.js (updatePaginationInfo, generatePagination), admin.js (isAdminMode), utils.js (copyToClipboard, toggleQuestionText), sort.js, constants.js (CURRICULUM_ORDER)
 
 async function renderQuestions() {
     const filters = {
@@ -36,7 +36,27 @@ async function renderQuestions() {
         return;
     }
     
-    grid.innerHTML = paginatedQuestions.map(q => `
+    grid.innerHTML = paginatedQuestions.map(q => {
+        // Check if answer is short (single character or very brief)
+        const isShortAnswer = q.answer && q.answer.trim().length <= 10;
+        
+        // Sort curriculum classifications by CURRICULUM_ORDER
+        const sortedCurriculum = q.curriculumClassification ? 
+            [...q.curriculumClassification].sort((a, b) => {
+                const indexA = CURRICULUM_ORDER.indexOf(a);
+                const indexB = CURRICULUM_ORDER.indexOf(b);
+                return indexA - indexB;
+            }) : [];
+        
+        // Sort chapter classifications numerically
+        const sortedChapters = q.AristochapterClassification ? 
+            [...q.AristochapterClassification].sort((a, b) => {
+                const numA = parseInt(a.replace('Chapter ', ''));
+                const numB = parseInt(b.replace('Chapter ', ''));
+                return numA - numB;
+            }) : [];
+        
+        return `
         <div class="question-card">
             <div class="question-header">
                 <div class="question-title">
@@ -57,8 +77,8 @@ async function renderQuestions() {
                             <button class="expand-btn" onclick="toggleQuestionText(this)" title="展開/收起">
                                 ▶
                             </button>
-                            <strong>題目 (中):</strong>
-                            <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.questionTextChi).replace(/"/g, '&quot;')}, this)" title="複製">
+                            <strong style="flex: 1;">題目 (中):</strong>
+                            <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.questionTextChi).replace(/"/g, '&quot;')}, this)" title="複製" style="flex-shrink: 0;">
                                 📋
                             </button>
                         </div>
@@ -71,8 +91,8 @@ async function renderQuestions() {
                             <button class="expand-btn" onclick="toggleQuestionText(this)" title="Expand/Collapse">
                                 ▶
                             </button>
-                            <strong>Question (Eng):</strong>
-                            <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.questionTextEng).replace(/"/g, '&quot;')}, this)" title="Copy">
+                            <strong style="flex: 1;">Question (Eng):</strong>
+                            <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.questionTextEng).replace(/"/g, '&quot;')}, this)" title="Copy" style="flex-shrink: 0;">
                                 📋
                             </button>
                         </div>
@@ -88,35 +108,43 @@ async function renderQuestions() {
                     ${q.correctPercentage !== null && q.correctPercentage !== undefined ? `<div class="info-item"><strong>答對率：</strong> ${q.correctPercentage}%</div>` : ''}
                 </div>
                 
-                ${q.answer ? `
+                ${q.answer ? (isShortAnswer ? `
+                    <div class="info-item" style="display: flex; align-items: center; gap: 8px;">
+                        <strong>答案：</strong> 
+                        <span style="flex: 1;">${q.answer}</span>
+                        <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.answer).replace(/"/g, '&quot;')}, this)" title="複製答案" style="flex-shrink: 0;">
+                            📋
+                        </button>
+                    </div>
+                ` : `
                     <div class="question-text">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
                             <button class="expand-btn" onclick="toggleQuestionText(this)" title="展開/收起">
                                 ▶
                             </button>
-                            <strong>答案：</strong>
-                            <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.answer).replace(/"/g, '&quot;')}, this)" title="複製答案">
+                            <strong style="flex: 1;">答案：</strong>
+                            <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.answer).replace(/"/g, '&quot;')}, this)" title="複製答案" style="flex-shrink: 0;">
                                 📋
                             </button>
                         </div>
                         <div class="question-text-content collapsed">${q.answer.trim()}</div>
                     </div>
-                ` : ''}
+                `) : ''}
                 <div></div>
-                ${q.curriculumClassification && q.curriculumClassification.length > 0 ? `
+                ${sortedCurriculum.length > 0 ? `
                     <div style="display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
                         <strong style="white-space: nowrap;">課程分類：</strong>
                         <div class="tag-container" style="flex: 1; margin: 0;">
-                            ${q.curriculumClassification.map(c => `<span class="tag">${c}</span>`).join('')}
+                            ${sortedCurriculum.map(c => `<span class="tag">${c}</span>`).join('')}
                         </div>
                     </div>
                 ` : ''}
 
-                ${q.AristochapterClassification && q.AristochapterClassification.length > 0 ? `
+                ${sortedChapters.length > 0 ? `
                     <div style="display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
-                        <strong style="white-space: nowrap;">Chapters：</strong>
+                        <strong style="white-space: nowrap;">Chapter:</strong>
                         <div class="tag-container" style="flex: 1; margin: 0;">
-                            ${q.AristochapterClassification.map(c => `<span class="tag">${c}</span>`).join('')}
+                            ${sortedChapters.map(c => `<span class="tag">${c}</span>`).join('')}
                         </div>
                     </div>
                 ` : ''}                
@@ -139,7 +167,16 @@ async function renderQuestions() {
                     </div>
                 ` : ''} 
                 
-                ${q.markersReport ? `<div class="info-item" style="margin-top: 10px;"><strong>評卷報告：</strong> ${q.markersReport.substring(0, 150)}${q.markersReport.length > 150 ? '...' : ''}</div>` : ''}
+                ${q.markersReport ? `
+                    <div class="info-item" style="margin-top: 10px; display: flex; align-items: flex-start; gap: 8px;">
+                        <div style="flex: 1;">
+                            <strong>評卷報告：</strong> ${q.markersReport.substring(0, 150)}${q.markersReport.length > 150 ? '...' : ''}
+                        </div>
+                        <button class="copy-btn" onclick="copyToClipboard(${JSON.stringify(q.markersReport).replace(/"/g, '&quot;')}, this)" title="複製評卷報告" style="flex-shrink: 0;">
+                            📋
+                        </button>
+                    </div>
+                ` : ''}
             </div>
             
             ${isAdminMode ? `
@@ -149,5 +186,6 @@ async function renderQuestions() {
                 </div>
             ` : ''}
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
