@@ -77,59 +77,66 @@
                     <button class="btn btn-clear-filter" onclick="clearFilters()">清除篩選</button>
                 </div>
 
-                <div class="dropdown-filter">
-                    <button class="dropdown-btn" onclick="toggleDropdown('percentage-dropdown')">
-                        答對率 ▼
-                    </button>
-                    <div id="percentage-dropdown" class="dropdown-content" style="min-width: 280px; padding: 16px;">
-                        
-                        <!-- Display current range -->
-                        <div style="text-align: center; margin-bottom: 16px;">
-                            <span style="font-size: 1.1em; font-weight: bold; color: #2c3e50;">
-                                <span id="min-percentage-display">0</span>% 
-                                — 
-                                <span id="max-percentage-display">100</span>%
-                            </span>
+                <!-- Range Filters Container (Side by Side, Collapsible) -->
+                <div class="range-filters-container">
+                    <!-- Percentage Filter -->
+                    <div class="dropdown-filter">
+                        <div class="dropdown-btn" onclick="toggleDropdown('percentage-dropdown')">
+                            答對率 ▼
                         </div>
-
-                        <!-- Dual range slider container -->
-                        <div class="range-slider-container">
-                            <div class="range-slider-track"></div>
-                            <div class="range-slider-fill" id="range-fill"></div>
-                            
-                            <input type="range" id="min-percentage" 
-                                min="0" max="100" value="0" step="1"
-                                class="range-slider-input range-min"
-                                oninput="updateDualRange()" 
-                                onchange="applyPercentageFilter()">
-                            
-                            <input type="range" id="max-percentage" 
-                                min="0" max="100" value="100" step="1"
-                                class="range-slider-input range-max"
-                                oninput="updateDualRange()" 
-                                onchange="applyPercentageFilter()">
-                        </div>
-
-                        <!-- Min/Max labels -->
-                        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.85em; color: #666;">
-                            <span>最低: <strong id="min-label">0</strong>%</span>
-                            <span>最高: <strong id="max-label">100</strong>%</span>
-                        </div>
-
-                        <hr style="margin: 16px 0; border: none; border-top: 1px solid #e0e0e0;">
-
-                        <!-- Clear button -->
-                        <button onclick="clearPercentageFilter()" 
-                                style="width: 100%; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold;">
-                            🗑️ 清除篩選
-                        </button>
-
-                        <!-- Info text -->
-                        <div style="margin-top: 12px; font-size: 0.8em; color: #999; text-align: center;">
-                            拖動滑桿設定答對率範圍
+                        <div id="percentage-dropdown" class="dropdown-content">
+                            <div class="range-filter-wrapper">
+                                <div class="range-filter-header">
+                                    <button class="range-clear-btn" onclick="clearPercentageFilter()" title="清除篩選">🗑️ 清除篩選</button>
+                                </div>
+                                <p class="range-info">拖動滑桿設定答對率範圍</p>
+                                
+                                <div class="range-slider-container">
+                                    <div class="range-slider-track"></div>
+                                    <div id="percentage-range-fill" class="range-slider-fill"></div>
+                                    <input type="range" id="min-percentage" class="range-slider-input range-min" 
+                                        min="0" max="100" value="0" oninput="updatePercentageRange()">
+                                    <input type="range" id="max-percentage" class="range-slider-input range-max" 
+                                        min="0" max="100" value="100" oninput="updatePercentageRange()">
+                                </div>
+                                
+                                <div class="range-values">
+                                    <span>最低: <strong id="min-percentage-display" class="range-value-label">0</strong>%</span>
+                                    <span>最高: <strong id="max-percentage-display" class="range-value-label">100</strong>%</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Marks Filter -->
+                    <div class="dropdown-filter">
+                        <div class="dropdown-btn" onclick="toggleDropdown('marks-dropdown')">
+                            分數 ▼
+                        </div>
+                        <div id="marks-dropdown" class="dropdown-content">
+                            <div class="range-filter-wrapper marks-filter">
+                                <div class="range-filter-header">
+                                    <button class="range-clear-btn" onclick="clearMarksFilter()" title="清除篩選">🗑️ 清除篩選</button>
+                                </div>
+                                <p class="range-info">拖動滑桿設定分數範圍</p>
+                                
+                                <div class="range-slider-container">
+                                    <div class="range-slider-track"></div>
+                                    <div id="marks-range-fill" class="range-slider-fill"></div>
+                                    <input type="range" id="min-marks" class="range-slider-input range-min" 
+                                        min="0" max="16" value="0" step="1" oninput="updateMarksRange()">
+                                    <input type="range" id="max-marks" class="range-slider-input range-max" 
+                                        min="0" max="16" value="16" step="1" oninput="updateMarksRange()">
+                                </div>
+                                
+                                <div class="range-values">
+                                    <span>最低: <strong id="min-marks-display" class="range-value-label">0</strong></span>
+                                    <span>最高: <strong id="max-marks-display" class="range-value-label">16</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                                                      
 
                 <!-- Advanced Filters -->
                 <div class="advanced-filters">

@@ -189,6 +189,53 @@ select:focus {
     display: inline-block;
 }
 
+/* ============================================
+   Dual Range Slider Components
+   ============================================ */
+
+/* Container for side-by-side collapsible filters */
+.range-filters-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Individual filter wrapper inside dropdown */
+.range-filter-wrapper {
+    padding: 0;
+}
+
+.range-filter-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.range-clear-btn {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px 8px;
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-sm);
+}
+
+.range-clear-btn:hover {
+    background: rgba(231, 76, 60, 0.1);
+    color: #c0392b;
+}
+
+.range-info {
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
 /* Dual Range Slider Container */
 .range-slider-container {
     position: relative;
@@ -288,6 +335,62 @@ select:focus {
 /* Make sure max slider is above min slider */
 .range-max {
     z-index: 4;
+}
+
+/* Range value display */
+.range-values {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #555;
+}
+
+.range-value-label {
+    font-weight: 600;
+    color: #3498db;
+}
+
+/* Marks filter specific styles */
+.marks-filter .range-slider-fill {
+    background: #9b59b6;
+}
+
+.marks-filter .range-slider-input::-webkit-slider-thumb {
+    border-color: #9b59b6;
+}
+
+.marks-filter .range-slider-input::-moz-range-thumb {
+    border-color: #9b59b6;
+}
+
+.marks-filter .range-slider-input::-webkit-slider-thumb:hover {
+    background: #9b59b6;
+    box-shadow: 0 3px 6px rgba(155, 89, 182, 0.4);
+}
+
+.marks-filter .range-slider-input::-moz-range-thumb:hover {
+    background: #9b59b6;
+    box-shadow: 0 3px 6px rgba(155, 89, 182, 0.4);
+}
+
+.marks-filter .range-slider-input:active::-webkit-slider-thumb {
+    background: #8e44ad;
+}
+
+.marks-filter .range-slider-input:active::-moz-range-thumb {
+    background: #8e44ad;
+}
+
+.marks-filter .range-value-label {
+    color: #9b59b6;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+    .range-filters-container {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ============================================

@@ -98,7 +98,7 @@ function updateUserDisplay() {
 }
 
 // Initialize app UI (called by init() and also by auth.js after login)
-// Dependencies: forms.js (setupFormHandler), filters.js (updateDualRange), render.js (renderQuestions), statistics.js (refreshStatistics)
+// Dependencies: forms.js (setupFormHandler), filters.js (updatePercentageRange, updateMarksRange), render.js (renderQuestions), statistics.js (refreshStatistics)
 async function initializeApp() {
     console.log('🔧 初始化應用程式介面...');
     
@@ -107,7 +107,12 @@ async function initializeApp() {
     
     // Initialize percentage slider
     if (document.getElementById('min-percentage')) {
-        updateDualRange();
+        updatePercentageRange();
+    }
+    
+    // Initialize marks slider
+    if (document.getElementById('min-marks')) {
+        updateMarksRange();
     }
     
     await populateYearFilter();
@@ -328,4 +333,3 @@ if (document.readyState === 'loading') {
     populateCurriculumFormOptions();
     init();
 }
-

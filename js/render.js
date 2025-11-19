@@ -1,12 +1,13 @@
 // Render questions
-// Dependencies: storage-core.js (storage), storage-filters.js (applyFilters), globals.js (paginationState, triStateFilters, window.percentageFilter), pagination.js (updatePaginationInfo, generatePagination), admin.js (isAdminMode), utils.js (copyToClipboard, toggleQuestionText), sort.js, constants.js (CURRICULUM_ORDER)
+// Dependencies: storage-core.js (storage), storage-filters.js (applyFilters), globals.js (paginationState, triStateFilters, window.percentageFilter, window.marksFilter), pagination.js (updatePaginationInfo, generatePagination), admin.js (isAdminMode), utils.js (copyToClipboard, toggleQuestionText), sort.js, constants.js (CURRICULUM_ORDER)
 
 async function renderQuestions() {
     const filters = {
         search: document.getElementById('search').value,
         year: document.getElementById('year-filter').value,
         triState: triStateFilters,
-        percentageFilter: window.percentageFilter 
+        percentageFilter: window.percentageFilter,
+        marksFilter: window.marksFilter
     };
     
     let questions = await storage.getQuestions(filters);

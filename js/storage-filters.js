@@ -53,8 +53,28 @@ IndexedDBStorage.prototype.applyFilters = function(questions, filters) {
             return percentage >= min && percentage <= max;
         });
         
-        console.log(`📊 Filtered by 答對率 ${min}%-${max}%: ${questions.length} questions`);
     }
+
+    // Marks filter
+        if (filters.marksFilter && filters.marksFilter.active) {
+            const { min, max } = filters.marksFilter;
+            
+            questions = questions.filter(q => {
+                if (q.marks === undefined || 
+                    q.marks === null || 
+                    q.marks === '') {
+                    return false;
+                }
+                
+                const marks = parseFloat(q.marks);
+                
+                if (isNaN(marks)) {
+                    return false;
+                }
+                
+                return marks >= min && marks <= max;
+            });
+        }
 
     // Tri-state filters
     if (filters.triState) {

@@ -1,4 +1,4 @@
-// Dependencies: globals.js (window.triStateFilters, window.paginationState, window.percentageFilter), render.js (renderQuestions)
+// Dependencies: globals.js (window.triStateFilters, window.paginationState, window.percentageFilter, window.marksFilter), render.js (renderQuestions)
 
 // Dropdown toggle
 // Dependencies: None
@@ -40,6 +40,13 @@ function toggleCollapsibleSection(sectionId, arrowId) {
     
     if (!section) return;
     
+    // Close other dropdown filters when opening chapters
+    if (sectionId === 'chapter-options') {
+        document.querySelectorAll('.dropdown-content').forEach(d => {
+            d.classList.remove('active');
+        });
+    }
+    
     const isHidden = section.style.display === 'none' || !section.style.display;
     
     if (isHidden) {
@@ -47,7 +54,7 @@ function toggleCollapsibleSection(sectionId, arrowId) {
         if (arrow) arrow.textContent = '▼';
     } else {
         section.style.display = 'none';
-        if (arrow) arrow.textContent = '▼';
+        if (arrow) arrow.textContent = '▶';
     }
 }
 
@@ -58,6 +65,16 @@ document.addEventListener('click', function(event) {
         document.querySelectorAll('.dropdown-content').forEach(d => {
             d.classList.remove('active');
         });
+        
+        // Also close chapter options
+        const chapterOptions = document.getElementById('chapter-options');
+        if (chapterOptions) {
+            chapterOptions.style.display = 'none';
+            const chapterArrow = document.getElementById('chapter-arrow');
+            if (chapterArrow) {
+                chapterArrow.textContent = '▶';
+            }
+        }
     }
 });
 
@@ -88,7 +105,7 @@ function toggleTriState(element) {
     filterQuestions();
 }
 
-// Dependencies: globals.js (window.triStateFilters, window.paginationState, window.percentageFilter), render.js (renderQuestions)
+// Dependencies: globals.js (window.triStateFilters, window.paginationState, window.percentageFilter, window.marksFilter), render.js (renderQuestions)
 function clearFilters() {
     document.getElementById('search').value = '';
     document.getElementById('year-filter').value = '';
@@ -102,6 +119,9 @@ function clearFilters() {
     // Reset percentage filter
     clearPercentageFilter();    
 
+    // Reset marks filter
+    clearMarksFilter();
+
     window.paginationState.questions.page = 1;
     renderQuestions();
 }
@@ -112,6 +132,10 @@ async function filterQuestions() {
     await renderQuestions();
 }
 
+// ============================================
+// PERCENTAGE FILTER
+// ============================================
+
 // Percentage filter state
 window.percentageFilter = {
     min: 0,
@@ -120,14 +144,17 @@ window.percentageFilter = {
 };
 
 // Dependencies: globals.js (window.percentageFilter)
-function updateDualRange() {
+function updatePercentageRange() {
     const minSlider = document.getElementById('min-percentage');
     const maxSlider = document.getElementById('max-percentage');
     const minDisplay = document.getElementById('min-percentage-display');
     const maxDisplay = document.getElementById('max-percentage-display');
-    const minLabel = document.getElementById('min-label');
-    const maxLabel = document.getElementById('max-label');
-    const rangeFill = document.getElementById('range-fill');
+    const rangeFill = document.getElementById('percentage-range-fill');
+    
+    if (!minSlider || !maxSlider || !minDisplay || !maxDisplay || !rangeFill) {
+        console.warn('⚠️ Percentage filter elements not found');
+        return;
+    }
     
     let minVal = parseInt(minSlider.value);
     let maxVal = parseInt(maxSlider.value);
@@ -141,8 +168,6 @@ function updateDualRange() {
     // Update displays
     minDisplay.textContent = minVal;
     maxDisplay.textContent = maxVal;
-    minLabel.textContent = minVal;
-    maxLabel.textContent = maxVal;
     
     // Update the filled range visualization
     const percentMin = (minVal / 100) * 100;
@@ -154,6 +179,9 @@ function updateDualRange() {
     // Update filter state
     window.percentageFilter.min = minVal;
     window.percentageFilter.max = maxVal;
+    
+    // Auto-apply filter on change
+    applyPercentageFilter();
 }
 
 // Dependencies: globals.js (window.percentageFilter), render.js (filterQuestions)
@@ -177,6 +205,8 @@ function clearPercentageFilter() {
     const minSlider = document.getElementById('min-percentage');
     const maxSlider = document.getElementById('max-percentage');
     
+    if (!minSlider || !maxSlider) return;
+    
     minSlider.value = 0;
     maxSlider.value = 100;
     
@@ -186,9 +216,97 @@ function clearPercentageFilter() {
         active: false
     };
     
-    updateDualRange();
+    updatePercentageRange();
     
-    console.log('🗑️ Cleared percentage filter');
+    // Trigger filter update
+    filterQuestions();
+}
+
+// ============================================
+// MARKS FILTER
+// ============================================
+
+// Marks filter state
+window.marksFilter = {
+    min: 0,
+    max: 16,
+    active: false
+};
+
+// Dependencies: globals.js (window.marksFilter)
+function updateMarksRange() {
+    const minSlider = document.getElementById('min-marks');
+    const maxSlider = document.getElementById('max-marks');
+    const minDisplay = document.getElementById('min-marks-display');
+    const maxDisplay = document.getElementById('max-marks-display');
+    const rangeFill = document.getElementById('marks-range-fill');
+    
+    if (!minSlider || !maxSlider || !minDisplay || !maxDisplay || !rangeFill) {
+        console.warn('⚠️ Marks filter elements not found');
+        return;
+    }
+    
+    let minVal = parseFloat(minSlider.value);
+    let maxVal = parseFloat(maxSlider.value);
+    
+    // Ensure min doesn't exceed max
+    if (minVal > maxVal) {
+        minVal = maxVal;
+        minSlider.value = minVal;
+    }
+    
+    // Update displays
+    minDisplay.textContent = minVal;
+    maxDisplay.textContent = maxVal;
+    
+    // Update the filled range visualization (max is 16 for marks)
+    const percentMin = (minVal / 16) * 100;
+    const percentMax = (maxVal / 16) * 100;
+    
+    rangeFill.style.left = percentMin + '%';
+    rangeFill.style.width = (percentMax - percentMin) + '%';
+    
+    // Update filter state
+    window.marksFilter.min = minVal;
+    window.marksFilter.max = maxVal;
+    
+    // Auto-apply filter on change
+    applyMarksFilter();
+}
+
+// Dependencies: globals.js (window.marksFilter), render.js (filterQuestions)
+function applyMarksFilter() {
+    const minVal = parseFloat(document.getElementById('min-marks').value);
+    const maxVal = parseFloat(document.getElementById('max-marks').value);
+    
+    // Only activate filter if range is not 0-16 (i.e., user has changed it)
+    window.marksFilter = {
+        min: minVal,
+        max: maxVal,
+        active: (minVal > 0 || maxVal < 16)
+    };
+    
+    // Trigger filter update
+    filterQuestions();
+}
+
+// Dependencies: globals.js (window.marksFilter), render.js (filterQuestions)
+function clearMarksFilter() {
+    const minSlider = document.getElementById('min-marks');
+    const maxSlider = document.getElementById('max-marks');
+    
+    if (!minSlider || !maxSlider) return;
+    
+    minSlider.value = 0;
+    maxSlider.value = 16;
+    
+    window.marksFilter = {
+        min: 0,
+        max: 16,
+        active: false
+    };
+    
+    updateMarksRange();
     
     // Trigger filter update
     filterQuestions();
