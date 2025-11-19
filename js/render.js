@@ -75,7 +75,7 @@ async function renderQuestions() {
                 ` : ''}
                 
                 <div class="question-info">
-                    ${q.publisher && q.publisher !== '-' ? `<div class="info-item"><strong>出版商：</strong> ${q.publisher}</div>` : ''}
+                    ${'' /* q.publisher && q.publisher !== '-' ? `<div class="info-item"><strong>出版商：</strong> ${q.publisher}</div>` : '' */ }
                     ${q.multipleSelectionType && q.multipleSelectionType !== '-' ? `<div class="info-item"><strong>複選：</strong> ${q.multipleSelectionType}</div>` : ''}
                     ${q.graphType && q.graphType !== '-' ? `<div class="info-item"><strong>圖表：</strong> ${q.graphType}</div>` : ''}
                     ${q.tableType && q.tableType !== '-' ? `<div class="info-item"><strong>表格：</strong> ${q.tableType}</div>` : ''}
